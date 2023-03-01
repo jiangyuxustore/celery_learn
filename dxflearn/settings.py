@@ -132,3 +132,20 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = '377832421@qq.com'
 EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
+
+
+# ====================================celery 相关配置 ==========================================
+broker_url = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
+result_backend = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/1'
+
+accept_content = ['json']
+result_accept_content = ['json']
+enable_utc = True
+timezone = 'Asia/Shanghai'
+
+
+worker_concurrency = 1  # worker个数, 默认等于CPU个数
+
+
+# Task result backend settings
+result_expires = 3600  # 设置存在redis中的结果3600秒后过期
