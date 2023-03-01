@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.mail import send_mail
-from dxflearn.tasks import send_feedback_email_task
+from dxf.tasks import send_feedback_email_task
 
 
 class SteelPlate(APIView):
