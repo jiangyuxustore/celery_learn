@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from utils import task
 
 
 class Task(APIView):
@@ -33,3 +34,16 @@ class SteelPlate(APIView):
         print("请求post方法")
         msg = {"name": "liying", "age": 29, "address": "安亭"}
         return Response(data=msg)
+
+
+class Email(APIView):
+
+    def post(self, request, *args, **kwargs):
+        subject = request.data['subject']
+        message = request.data['message']
+        task_instance = task.EmailTask()
+        # delay_instance = task_instance.apply_async(args=(subject, message))
+        task_instance.delay(subject, message)
+        msg = {"msg": "邮件已经发送"}
+        return Response(data=msg)
+
