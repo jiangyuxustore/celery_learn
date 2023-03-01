@@ -9,5 +9,8 @@ from celery import Celery
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
+# 这个的namespace大写, 那就意味着在django的settings.py中有关celery的配置都要大写
 app.config_from_object("django.conf:settings", namespace="CELERY")
+# 要使 app.autodiscover_tasks() 自动加载celery任务, 需要在 Django 的每个应用程序内的单独创建
+# tasks.py 模块, 并在tasks.py中中定义 Celery 任务
 app.autodiscover_tasks()

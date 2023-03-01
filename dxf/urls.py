@@ -18,7 +18,7 @@ from django.urls import path
 from dxf import views
 
 urlpatterns = [
-    path('v1/start', views.Task.as_view()),
     path('v1/main', views.SteelPlate.as_view()),
-    path('v1/email', views.Email.as_view())
+    path('v1/email', views.Email.as_view()),
+    path('v1/async-email', views.AsyncEmail.as_view())
 ]
