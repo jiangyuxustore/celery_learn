@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-slm@76qes+m7nwix4x408=wo@9pu0_9*6#&)wvx-g1-x0od206'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'dxf'
+    'dxf',
+    'user'
 ]
 
 MIDDLEWARE = [
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'dxflearn.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,8 +78,12 @@ WSGI_APPLICATION = 'dxflearn.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': "dxf",
+        "USER": "root",
+        "PASSWORD": "Jiangyuxu123...",
+        "HOST": "124.70.136.165",
+        "PORT": 3306
     }
 }
 
@@ -125,6 +130,45 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# =====================================redis session 相关配置 =========================================
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://124.70.136.165:6379/1",  # 指明使用redis的1号数据库
+        "OPTIONS": {
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100, "retry_on_timeout": True},
+            "PASSWORD": "django-insecure-jiangyuxu-learn-django",
+            "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
+            "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
+        }
+    },
+    "session": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://124.70.136.165:6379/3",  # 指明使用redis的3号数据库
+        "OPTIONS": {
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100, "retry_on_timeout": True},
+            "PASSWORD": "django-insecure-jiangyuxu-learn-django",
+            "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
+            "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
+        }
+    }
+}
+
+# session使用的存储方式
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# 指明使用哪一个库保存session数据
+SESSION_CACHE_ALIAS = "session"
+# 设置session失效时间,单位为秒
+SESSION_COOKIE_AGE = 60*5
+
+
+# =====================================邮件 相关配置 ===========================================
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.qq.com'
 EMAIL_PORT = 25
@@ -135,6 +179,18 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 
 
 # ====================================celery 相关配置 ==========================================
+
 CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
 CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/1'
 
+# ================================rest framework 相关配置 ======================================
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.FormParser"
+    ]
+}

@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('task/api/', include(('dxf.urls', 'dxf'), namespace='dxf')),
     path('', RedirectView.as_view(url='task/api/v1/main', permanent=True)),
+    path('user/api/', include(('user.urls', 'user'), namespace='user')),
 ]
