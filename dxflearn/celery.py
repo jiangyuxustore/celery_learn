@@ -7,6 +7,8 @@
 import os
 from celery import Celery
 from user import tasks as user_task
+from steelplate import tasks as steel_task
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
@@ -16,3 +18,4 @@ app.config_from_object("django.conf:settings", namespace="CELERY")
 # tasks.py 模块, 并在tasks.py中中定义 Celery 任务
 app.autodiscover_tasks()  # 会自动从django的INSTALLED_APPS中的应用目录下加载tasks.py
 app.register_task(user_task.UserOperator())  # class base task 需要注册到celery中
+app.register_task(steel_task.SteelOriginalInfoOperator())
