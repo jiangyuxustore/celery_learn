@@ -183,7 +183,7 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 # ====================================celery 相关配置 ==========================================
 
 CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
-CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/1'
+CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3'
 CELERY_RESULT_EXPIRES = 3600 * 12
 
 # ================================rest framework 的全局配置 ======================================
