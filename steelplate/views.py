@@ -5,7 +5,7 @@
 # import shutil
 # import json
 # from utils import messages
-# from rest_framework.views import APIView
+from rest_framework.views import APIView
 # from rest_framework.pagination import PageNumberPagination
 # from rest_framework import serializers
 # from utils.grpc_service import scheduler_center
@@ -550,6 +550,6 @@
 #
 #
 # #
-# # class SaveMaterialId(APIView):
-# #     def post(self, request, *args, **kwargs):
-# #         pass
+class SaveMaterialId(APIView):
+    def post(self, request, *args, **kwargs):
+        pass
