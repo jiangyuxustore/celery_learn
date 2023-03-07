@@ -20,7 +20,7 @@ app_name = "user"  # 指定app_name用户反向生成url
 
 # URL 最好是以^开头, 以$结尾, 新版django如果URL中包含正则那么需要引入re_path
 urlpatterns = [
-    re_path(r'^v1/register/$', views.Register.as_view()),
+    re_path(r'^(?P<version>[v1|v2]+)/register/$', views.Register.as_view()),
     re_path(r'^v1/email-verify/$', views.EmailVerify.as_view()),
     re_path(r'^v1/login/$', views.Login.as_view()),
     re_path(r'^v1/order/$', views.OrderList.as_view()),

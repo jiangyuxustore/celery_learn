@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'dxf',
     'user',
     "steelplate",
+    "asyncresult",
 ]
 
 MIDDLEWARE = [
@@ -136,7 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://124.70.136.165:6379/1",  # 指明使用redis的1号数据库
+        "LOCATION": "redis://124.70.136.165:6379/4",  # 指明使用redis的1号数据库
         "TIMEOUT": 86400,
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
@@ -149,7 +150,7 @@ CACHES = {
     },
     "session": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://124.70.136.165:6379/3",  # 指明使用redis的3号数据库
+        "LOCATION": "redis://124.70.136.165:6379/4",  # 指明使用redis的3号数据库
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -184,7 +185,8 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 
 CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
 CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3'
-CELERY_RESULT_EXPIRES = 3600 * 12
+CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
+CELERY_TIMEZONE = 'Asia/Shanghai'
 
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {

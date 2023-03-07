@@ -1,17 +1,11 @@
-# -*- coding: utf-8 -*-
-"""
-@Auth ： 江宇旭
-@Email ：jiang.yuxu@mech-mind.net
-@Time ： 2023/3/1 17:13
-"""
-"""
-异步任务模块
-"""
+"""异步任务模块"""
 from time import sleep
 from django.core.mail import send_mail
-from celery import shared_task
+from celery import shared_task, Task
+from user.models import User
 
 
+# ==============================================基于函数的异步任务==================================================
 @shared_task()
 def send_feedback_email_task(subject, message):
     """发送邮件给用户, 进行邮箱验证"""
@@ -24,3 +18,17 @@ def send_feedback_email_task(subject, message):
         recipient_list=['jiang.yuxu@mech-mind.net'],
         fail_silently=False
     )
+
+
+# ==============================================基于类的异步任务==================================================
+
+
+class UserOperator(Task):
+    name = "UserOperator"  # 必须要指定一个全局唯一的name属性, 不然celery启动的时候报错
+
+    def run(self, request, username, password, email, random_uuid,*args, **kwargs):
+        """必须要重写run方法, 这个是继承Task类的主体运行逻辑"""
+        user = User.objects.create_user(username=username, password=password, email=email, is_active=0)
+        request.session['userid'] = user.id
+        request.session['random_uuid'] = random_uuid
+        return 'success'

@@ -24,4 +24,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='task/api/v1/main', permanent=True)),
     path('user/api/', include(('user.urls', 'user'), namespace='user')),
     path('steelplate/api/', include(('steelplate.urls', 'steelplate'), namespace='steelplate'),),
+    path('asyncresult/api/', include(('asyncresult.urls', 'asyncresult'), namespace='asyncresult'),),
 ]

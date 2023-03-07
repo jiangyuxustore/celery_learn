@@ -1,5 +1,6 @@
 import datetime
 import uuid
+import time
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
@@ -13,7 +14,7 @@ from user.custompermissions import SuperPermission
 from user.customserializer import OrderSerializer
 from user.customthrottle import VisitThrottle
 from rest_framework import status
-from user.tasks import send_feedback_email_task
+from user.tasks import send_feedback_email_task, UserOperator
 from user.models import Order
 
 
@@ -26,18 +27,48 @@ class Register(APIView):
 
     def post(self, request, *args, **kwargs):
         """接收用户名密码并存储到数据库, 同时给用户发送一封邮件进行验证"""
+        version = kwargs.get("version")
+        if version == "v1":
+            response = self.execute_v1(request, *args, **kwargs)
+            return response
+        elif version == "v2":
+            response = self.execute_v2(request, *args, **kwargs)
+            return response
+
+    def execute_v1(self, request, *args, **kwargs):
+        """v1版本的接口是先执行同步的用户数据保存, 然后执行异步的邮件发送"""
+        start_time = time.time()
         username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("email")
         user = User.objects.create_user(username=username, password=password, email=email, is_active=0)
+        end_save_time = time.time()
+        print("数据插入耗时:{}".format(end_save_time - start_time))
         random_uuid = str(uuid.uuid1())
-        print("random_uuid:{}".format(random_uuid))
         # 这里设置session, 待会邮件验证的那个接口会需要用这个userid和random_uuid进行验证
         request.session['userid'] = user.id
         request.session['random_uuid'] = random_uuid
         send_feedback_email_task.delay(subject="注册验证", message="随机验证码:{}".format(random_uuid))
         response = redirect("/user/api/v1/email-verify")
         response.set_cookie("userid", user.id)
+        end_time = time.time()
+        print("发送异步邮件耗时:{}".format(end_time - end_save_time))
+        return response
+
+    def execute_v2(self, request, *args, **kwargs):
+        start_time = time.time()
+        username = request.data.get("username")
+        password = request.data.get("password")
+        email = request.data.get("email")
+        random_uuid = str(uuid.uuid1())
+        user = UserOperator()
+        user.apply_async(request, username, password, email, random_uuid)
+        end_save_time = time.time()
+        print("异步数据库插入耗时:{}".format(end_save_time - start_time))
+        send_feedback_email_task.delay(subject="注册验证", message="随机验证码:{}".format(random_uuid))
+        end_time = time.time()
+        print("发送异步邮件耗时:{}".format(end_time - end_save_time))
+        response = redirect("/user/api/v1/email-verify")
         return response
 
 
