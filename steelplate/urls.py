@@ -21,4 +21,6 @@ app_name = "steel"  # 指定app_name用户反向生成url
 # URL 最好是以^开头, 以$结尾, 新版django如果URL中包含正则那么需要引入re_path
 urlpatterns = [
     re_path(r'^(?P<version>[v1|v2]+)/detail/(?P<pk>[0-9]+)/$', views.SaveMaterialId.as_view(), name="detail"),
+    re_path(r'^(?P<version>[v1|v2]+)/task/$', views.Task.as_view(), name="task"),
+    re_path(r'^(?P<version>[v1|v2]+)/task-detail/(?P<pk>[0-9]+)/$', views.TaskDetail.as_view(), name="task-detail"),
 ]

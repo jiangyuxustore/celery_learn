@@ -1,42 +1,42 @@
-# from django.db import models
-# import datetime
-#
-#
-# class SteelOriginalInfo(models.Model):
-#     """
-#     我司内部定义的原始钢板任务表
-#     # wait ready executed success failed.
-#     # 中控下发任务后初始状态都是wait.
-#     # vision，viz解析完成返回数据后状态更新为ready，ready状态的任务可以开始也可以停止.
-#     # 当任务开始时，状态更新为--> executed，当任务停止时，状态更新为-->failed ，已经开始的任务只能停止，无法继续开始.
-#     """
-#
-#     task_id = models.CharField(max_length=128, primary_key=True, verbose_name="钢板任务号")
-#     line_id = models.IntegerField(null=True, verbose_name="输送线id")
-#     board_thick = models.CharField(max_length=128, null=True, verbose_name="钢板厚度(客户发的)")
-#     board_type = models.CharField(max_length=128, null=True, verbose_name="钢板型号(客户发的)")
-#     task_status = models.CharField(max_length=50, null=False, verbose_name="任务状态")
-#     total_count = models.IntegerField(default=0, null=False, verbose_name="零件总数量")  # 客户图纸里面包含partSize 1,2,3的零件数
-#     active_count = models.IntegerField(default=0, verbose_name="可分拣零件数")  # vision解析后返回的可分拣零件数
-#     success_count = models.IntegerField(default=0, null=False, verbose_name="抓取成功数量")
-#     failed_count = models.IntegerField(default=0, null=False, verbose_name="抓取失败取数量")
-#     json_path = models.CharField(max_length=256, null=True, verbose_name="json图纸的路径")
-#     dxf_path = models.CharField(max_length=256, null=True, verbose_name="dxf图纸的路径")
-#     plate_img = models.CharField(max_length=500, null=True, verbose_name="所有工件在整块钢板上的图像路径")
-#     plate_size = models.CharField(max_length=256, null=True, verbose_name="钢板的尺寸")  # vision解析工程会返回这个字段
-#     start_time = models.DateTimeField(null=True, verbose_name="任务开始时间")
-#     end_time = models.DateTimeField(null=True, verbose_name="任务结束时间")
-#     is_manual_success = models.IntegerField(default=0, null=False, verbose_name="是否手动置为成功(0:否, 1:是)")
-#     is_manual_generate = models.IntegerField(default=0, null=False, verbose_name="是否手动生成任务(0:否, 1:是)")
-#     is_delete = models.IntegerField(default=0, null=False, verbose_name="是否删除(0:否, 1:是)")
-#     created_time = models.DateTimeField(auto_now_add=True, auto_now=False, verbose_name="创建时间")
-#     updated_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
-#
-#     class Meta:
-#         """元数据"""
-#
-#         db_table = "steel_original_info"
-#         verbose_name_plural = "钢板原始信息表"
+from django.db import models
+import datetime
+
+
+class SteelOriginalInfo(models.Model):
+    """
+    我司内部定义的原始钢板任务表
+    # wait ready executed success failed.
+    # 中控下发任务后初始状态都是wait.
+    # vision，viz解析完成返回数据后状态更新为ready，ready状态的任务可以开始也可以停止.
+    # 当任务开始时，状态更新为--> executed，当任务停止时，状态更新为-->failed ，已经开始的任务只能停止，无法继续开始.
+    """
+
+    task_id = models.CharField(max_length=128, primary_key=True, verbose_name="钢板任务号")
+    line_id = models.IntegerField(null=True, verbose_name="输送线id")
+    board_thick = models.CharField(max_length=128, null=True, verbose_name="钢板厚度(客户发的)")
+    board_type = models.CharField(max_length=128, null=True, verbose_name="钢板型号(客户发的)")
+    task_status = models.CharField(max_length=50, null=False, verbose_name="任务状态")
+    total_count = models.IntegerField(default=0, null=False, verbose_name="零件总数量")  # 客户图纸里面包含partSize 1,2,3的零件数
+    active_count = models.IntegerField(default=0, verbose_name="可分拣零件数")  # vision解析后返回的可分拣零件数
+    success_count = models.IntegerField(default=0, null=False, verbose_name="抓取成功数量")
+    failed_count = models.IntegerField(default=0, null=False, verbose_name="抓取失败取数量")
+    json_path = models.CharField(max_length=256, null=True, verbose_name="json图纸的路径")
+    dxf_path = models.CharField(max_length=256, null=True, verbose_name="dxf图纸的路径")
+    plate_img = models.CharField(max_length=500, null=True, verbose_name="所有工件在整块钢板上的图像路径")
+    plate_size = models.CharField(max_length=256, null=True, verbose_name="钢板的尺寸")  # vision解析工程会返回这个字段
+    start_time = models.DateTimeField(null=True, verbose_name="任务开始时间")
+    end_time = models.DateTimeField(null=True, verbose_name="任务结束时间")
+    is_manual_success = models.IntegerField(default=0, null=False, verbose_name="是否手动置为成功(0:否, 1:是)")
+    is_manual_generate = models.IntegerField(default=0, null=False, verbose_name="是否手动生成任务(0:否, 1:是)")
+    is_delete = models.IntegerField(default=0, null=False, verbose_name="是否删除(0:否, 1:是)")
+    created_time = models.DateTimeField(auto_now_add=True, auto_now=False, verbose_name="创建时间")
+    updated_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        """元数据"""
+
+        db_table = "steel_original_info"
+        verbose_name_plural = "钢板原始信息表"
 #
 #
 # class SteelWorkpieceCommonInfo(models.Model):
@@ -113,36 +113,3 @@
 #         db_table = "steel_workpiece_instance_info"
 #         verbose_name_plural = "钢板工件实例信息表"
 #
-#
-# class MagneticJson(models.Model):
-#     """该表只存一个字段，ee2.json"""
-#
-#     id = models.AutoField(primary_key=True, verbose_name="自增主键")
-#     json_response = models.TextField(verbose_name="ee2.json数据")
-#
-#     class Meta:
-#         """元数据"""
-#
-#         db_table = "steel_magnetic_json"
-#         verbose_name_plural = "vision json配置表"
-#
-#
-# class ConveyorLineInfo(models.Model):
-#     """输送线的一些信息"""
-#
-#     line_id = models.IntegerField(primary_key=True, verbose_name="输送线id")
-#     berth_id = models.CharField(max_length=128, null=False, verbose_name="泊位编号")
-#     ipc_ip = models.CharField(max_length=128, null=False, verbose_name="输送线上工控机的ip")
-#
-#     class Meta:
-#         """元数据"""
-#
-#         db_table = "steel_conveyor_line_info"
-#         verbose_name_plural = "钢板输送线信息表"
-#
-#
-# class MaterialId(models.Model):
-#     """material id model"""
-#
-#     pk = models.IntegerField(primary_key=True, verbose_name="主键id")
-#     material_id = models.CharField(max_length=128, null=False, verbose_name="material id")

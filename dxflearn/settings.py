@@ -210,7 +210,7 @@ REST_FRAMEWORK = {
     ],
     # 匿名用户限制访问是
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "3/min",    # 设置匿名用户1分钟可以访问3次, redis中的key过期时间是60s
+        "anon": "13/min",    # 设置匿名用户1分钟可以访问3次, redis中的key过期时间是60s
         "burst": "5/min",
         "sustained": "1000/day"
     },

@@ -1,44 +1,38 @@
-# import datetime
-# import math
-# from collections import OrderedDict
-# import requests
-# import shutil
-# import json
-# from utils import messages
+import datetime
+import math
+import re
+from collections import OrderedDict
+import requests
+import shutil
+import json
 from rest_framework.views import APIView
-# from rest_framework.pagination import PageNumberPagination
-# from rest_framework import serializers
-# from utils.grpc_service import scheduler_center
-# from utils.logcreator import view_log, san_yi_log
-# from utils.logcreator import log_folder
-# from utils.drawparse import parse_center
-# from utils.public import view_wrapper, syview_wrapper
-# from utils import systatus
-# from utils.externalcommunication import wcs
-# import os
-# from steelplate import models
-# from mechmind import settings
-# import re
-#
-#
-# class PalletNumberPagination(PageNumberPagination):
-#     """分页类"""
-#
-#     page_size = 20
-#     max_page_size = 10
-#     page_size_query_param = "size"
-#     page_query_param = "page"
-#
-#     def get_paginated_response(self, data, cur_page=1):
-#         """重写父类的方法，增加一个total_page字段"""
-#         return OrderedDict(
-#             [
-#                 ("count", self.page.paginator.count),
-#                 ("cur_page", cur_page),  # 默认第一页。如果有请求参数，用请求参数
-#                 ("total_pages", math.ceil(self.page.paginator.count / self.page_size)),
-#                 ("tasks", data),
-#             ]
-#         )
+from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import serializers
+import os
+from steelplate import models
+from steelplate.customserializer import SteelOriginalInfoSerializer
+from steelplate.tasks import SteelOriginalInfoOperator
+
+
+class PalletNumberPagination(PageNumberPagination):
+    """分页类"""
+
+    page_size = 20
+    max_page_size = 10
+    page_size_query_param = "size"
+    page_query_param = "page"
+
+    def get_paginated_response(self, data, cur_page=1):
+        """重写父类的方法，增加一个total_page字段"""
+        return OrderedDict(
+            [
+                ("count", self.page.paginator.count),
+                ("cur_page", cur_page),  # 默认第一页。如果有请求参数，用请求参数
+                ("total_pages", math.ceil(self.page.paginator.count / self.page_size)),
+                ("tasks", data),
+            ]
+        )
 #
 #
 # class PagerSerializer(serializers.ModelSerializer):
@@ -128,219 +122,101 @@ from rest_framework.views import APIView
 #         return response_msg
 #
 #
-# class Task(APIView):
-#     """与中控系统交互的接口, 中控系统通过此接口下发任务, 查询任务"""
-#
-#     @view_wrapper
-#     def get(self, request, *args, **kwargs):
-#         """
-#         历史任务查询, 查询所有或按照查询条件进行按条件返回。返回的结果是表steel_original_info中的数据
-#         @ demo
-#         @ url http://127.0.0.1:8000/steelplate/api/v1/task #返回所有的父任务的信息，这个是默认的
-#               http://127.0.0.1:8000/steelplate/api/v1/task?page=2 #查询下一页数据，只需要修改page参数即可
-#               http://127.0.0.1:8000/steelplate/api/v1/task?task_status=success&page=2 #查询任务状态为success的第二页的数据
-#               http://127.0.0.1:8000/steelplate/api/v1/task?task_id=975c28ec-79c4-11ec-9b30-f47b09172194 # 根据任务号进行查询
-#               http://127.0.0.1:8000/steelplate/api/v1/task?task_status=success #查询任务状态为success的数据
-#         """
-#         query_params = dict(request.query_params.items())
-#         cur_page = int(query_params.pop("page", 1))
-#         query_params.pop("size", 404)
-#         if len(query_params) == 0:
-#             data = models.SteelOriginalInfo.objects.all().filter(is_delete=0).order_by("-created_time")
-#         else:
-#             data = models.SteelOriginalInfo.objects.filter(**query_params).filter(is_delete=0).order_by("-created_time")
-#         page = PalletNumberPagination()
-#         page_instance = page.paginate_queryset(queryset=data, request=request, view=self)
-#         pallet_data = PagerSerializer(instance=page_instance, many=True)
-#         return page.get_paginated_response(pallet_data.data, cur_page)
-#
-#     @syview_wrapper
-#     def post(self, request, *args, **kwargs):
-#         """任务下发，启动任务."""
-#         request_data = request.data.get("requestData")
-#         task_id = request_data.get("taskID")
-#         task_status = request_data["taskStatus"]
-#         if task_status == 0:
-#             self.download_file(task_id=task_id, request_data=request_data)
-#             response_msg = {"task_id": task_id, "msg": "接收图纸解析任务成功"}
-#         elif task_status == 1:
-#             line_id = int(request_data.get("lineID"))
-#             self.before_start_check(task_id, line_id)
-#             start_strategy = request_data.get("start_strategy", "generate")
-#             instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
-#             task_status = instance.task_status
-#             is_delete = instance.is_delete
-#             if task_status == messages.TASK_MODIFY:
-#                 raise systatus.AppException(systatus.MODIFY_TASK_CAN_NOT_START)
-#             elif task_status == messages.TASK_WAIT:
-#                 raise systatus.AppException(systatus.WAIT_TASK_CAN_NOT_START)
-#             if is_delete:
-#                 raise systatus.AppException(systatus.DELETE_TASK_CAN_NOT_START)
-#             scheduler_center.start_task(task_id, line_id, start_strategy)
-#             san_yi_log.info("中控下发{}线启动钢板分拣, 任务号:{}".format(line_id, task_id))
-#             response_msg = {"task_id": task_id, "msg": "启动任务成功"}
-#         return response_msg
-#
-#     def before_start_check(self, task_id, line_id):
-#         """启动任务前的检查"""
-#         try:
-#             instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
-#             task_status = instance.task_status
-#             if task_status == messages.TASK_WAIT:
-#                 raise systatus.AppException(systatus.WAIT_TASK_CAN_NOT_START)
-#         except Exception as e:
-#             context = {
-#                 "task_id": task_id,
-#                 "line_id": line_id,
-#                 "total_count": 0,
-#                 "active_count": 0,
-#                 "success_count": 0,
-#                 "status": 1,
-#                 "part_list": [],
-#             }
-#             wcs.done_callback(context)
-#
-#     def download_file(self, task_id, request_data):
-#         """下载json图纸/dxf图纸"""
-#         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-#         common_info_dir = settings.COMMON_INFO_DIR
-#         private_info_dir = settings.PRIVATE_INFO_DIR
-#         file_write_path = os.path.join(private_info_dir, current_date, task_id)
-#         if not os.path.exists(file_write_path):
-#             os.makedirs(file_write_path)
-#         json_url = settings.JSON_URL + "{}.json".format(task_id)
-#         dxf_url = settings.DXF_URL + "{}.dxf".format(task_id)
-#         json_path = self.download(json_url, file_write_path)
-#         filter_json_path, total_count, active_count = self.filter_big_steel(json_path)
-#         dxf_path = self.download(dxf_url, file_write_path)
-#         request_data["active_count"] = active_count
-#         request_data["total_count"] = total_count
-#         request_data["json_path"] = json_path
-#         request_data["file_write_path"] = file_write_path
-#         request_data["common_info_dir"] = common_info_dir
-#         request_data["filter_json_path"] = filter_json_path
-#         request_data["dxf_path"] = dxf_path
-#         self.save_to_mysql(request_data)
-#
-#     def save_to_mysql(self, request_data):
-#         """将中控发送的任务写入mysql"""
-#         task_id = request_data.get("taskID")
-#         board_thick = request_data.get("boardThick")
-#         board_type = request_data.get("boardType")
-#         file_write_path = request_data["file_write_path"]
-#         common_info_dir = request_data["common_info_dir"]
-#         json_path = request_data["json_path"]
-#         filter_json_path = request_data["filter_json_path"]
-#         dxf_path = request_data["dxf_path"]
-#         total_count = request_data["total_count"]
-#         active_count = request_data["active_count"]
-#         steel_original_info = models.SteelOriginalInfo(
-#             task_id=task_id,
-#             task_status="wait",
-#             total_count=total_count,
-#             active_count=active_count,
-#             board_thick=board_thick,
-#             board_type=board_type,
-#             json_path=filter_json_path,
-#             dxf_path=dxf_path,
-#             created_time=str(datetime.datetime.now()),
-#         )
-#         steel_original_info.save()
-#
-#         msg = {
-#             "file_write_path": file_write_path,
-#             "filter_json_path": filter_json_path,
-#             "json_path": json_path,
-#             "dxf_path": dxf_path,
-#             "common_info_dir": common_info_dir,
-#         }
-#         vision_msg = messages.ServerAdapterMessageTemplate(receiver=("vision", "viz"), task_id=task_id, msg=msg)
-#         parse_center.submit_task_to_parse(vision_msg, orientation="left")
-#         san_yi_log.info("中控下发图纸解析, 任务号:{}, 任务成功推送到任务队列".format(task_id))
-#
-#     def download(self, request_url, file_write_path=None):
-#         """
-#         :param request_url: str, 中控下载文件的url
-#         :param file_write_path: str, 获取到的文件写到何处
-#         :return:
-#         """
-#         response = requests.get(request_url)
-#         filename = os.path.basename(request_url)
-#         if response.status_code == 200:
-#             fullpath = os.path.join(file_write_path, filename)
-#             with open(fullpath, "wb") as f:
-#                 f.write(response.content)
-#             return fullpath
-#         else:
-#             raise systatus.AppException(systatus.DOWNLOAD_FILE_FAILED)
-#
-#     def filter_big_steel(self, path):
-#         """筛选出大件"""
-#         with open(path, "r", encoding="utf-8") as f:
-#             data = json.loads(f.read())
-#             part_list = []
-#             total_count = len(data["PartList"])
-#             for item in data["PartList"]:
-#                 if item["PartSize"] == 3:
-#                     part_list.append(item)
-#             data["PartList"] = part_list
-#             active_count = len(part_list)
-#         dir_path = os.path.dirname(path)
-#         file_name = "filter" + os.path.basename(path)
-#         filter_json_path = os.path.join(dir_path, file_name)
-#         with open(filter_json_path, "w+", encoding="utf-8") as f:
-#             f.write(json.dumps(data, ensure_ascii=False))
-#         return filter_json_path, total_count, active_count
-#
-#     @staticmethod
-#     def clear_adapter_log_file():
-#         """清空日志文件"""
-#         file_list = os.listdir(log_folder)
-#         for file in file_list:
-#             current_date = datetime.date.today()
-#             file_date_str = re.search(r"(\d+-\d+-\d+)", file).group(1)
-#             file_date = datetime.datetime.strptime(file_date_str, "%Y-%m-%d").date()
-#             diff_day = (current_date - file_date).days
-#             if diff_day > 3:
-#                 log_file_path = os.path.join(log_folder, file)
-#                 os.remove(log_file_path)
-#
-#     @view_wrapper
-#     def delete(self, request, *args, **kwargs):
-#         """删除接口"""
-#         request_data = request.data["request_data"]
-#         task_list = request_data["task_list"]
-#         view_log.info("删除切割任务, task_list:{}".format(task_list))
-#         delete_task_list = []
-#         for task_id in task_list:
-#             instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
-#             task_status = instance.task_status
-#             if task_status == messages.TASK_EXECUTED:
-#                 continue
-#             instance.is_delete = 1
-#             instance.save()
-#             delete_task_list.append(task_id)
-#         response_msg = {"task_id": delete_task_list, "msg": "删除成功"}
-#         return response_msg
-#
-#     @view_wrapper
-#     def put(self, request, *args, **kwargs):
-#         """更新接口"""
-#         request_data = request.data["request_data"]
-#         task_id = request_data["task_id"]
-#         update_fields = request_data["update_fields"]
-#         view_log.info("修改切割任务, task_id:{}, update_fields:{}".format(task_id, update_fields))
-#         instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
-#         task_status = instance.task_status
-#         if task_status == messages.TASK_EXECUTED:
-#             raise systatus.AppException(systatus.EXECUTED_TASK_CAN_NOT_MODIFY)
-#         instance.task_status = messages.TASK_MODIFY
-#         instance.__dict__.update(**update_fields)
-#         instance.save()
-#         response_msg = {"task_id": task_id, "msg": "任务被重置为修改状态"}
-#         return response_msg
-#
-#
+class Task(APIView):
+    def get(self, request, *args, **kwargs):
+        pass
+
+    def post(self, request, *args, **kwargs):
+        print("创建一个任务")
+        method = request.method
+        data = request.data
+        async_task_id = self.operator_steel_original(method, data)
+        msg = {"async_task_id": async_task_id}
+        return Response(data=msg)
+
+    def operator_steel_original(self, method, data):
+        operator = SteelOriginalInfoOperator()
+        async_instance = operator.apply_async(args=(method, data))
+        return async_instance.task_id
+
+
+class TaskDetail(APIView):
+    """与中控系统交互的接口, 中控系统通过此接口下发任务, 查询任务"""
+
+    def get(self, request, *args, **kwargs):
+        """
+        历史任务查询, 查询所有或按照查询条件进行按条件返回。返回的结果是表steel_original_info中的数据
+        @ demo
+        @ url http://127.0.0.1:8000/steelplate/api/v1/task #返回所有的父任务的信息，这个是默认的
+              http://127.0.0.1:8000/steelplate/api/v1/task?page=2 #查询下一页数据，只需要修改page参数即可
+              http://127.0.0.1:8000/steelplate/api/v1/task?task_status=success&page=2 #查询任务状态为success的第二页的数据
+              http://127.0.0.1:8000/steelplate/api/v1/task?task_id=975c28ec-79c4-11ec-9b30-f47b09172194 # 根据任务号进行查询
+              http://127.0.0.1:8000/steelplate/api/v1/task?task_status=success #查询任务状态为success的数据
+        """
+        query_params = dict(request.query_params.items())
+        cur_page = int(query_params.pop("page", 1))
+        query_params.pop("size", 404)
+        if len(query_params) == 0:
+            data = models.SteelOriginalInfo.objects.all().filter(is_delete=0).order_by("-created_time")
+        else:
+            data = models.SteelOriginalInfo.objects.filter(**query_params).filter(is_delete=0).order_by("-created_time")
+        page = PalletNumberPagination()
+        page_instance = page.paginate_queryset(queryset=data, request=request, view=self)
+        pallet_data = SteelOriginalInfoSerializer(instance=page_instance, many=True)
+        return page.get_paginated_response(pallet_data.data, cur_page)
+
+    def post(self, request, *args, **kwargs):
+        """任务下发，启动任务."""
+        task_id = request.data.get("taskID")
+        board_thick = request.data.get("boardThick")
+        board_type = request.data.get("boardType")
+        file_write_path = request.data["file_write_path"]
+        common_info_dir = request.data["common_info_dir"]
+        json_path = request.data["json_path"]
+        filter_json_path = request.data["filter_json_path"]
+        dxf_path = request.data["dxf_path"]
+        total_count = request.data["total_count"]
+        active_count = request.data["active_count"]
+        steel_original_info = models.SteelOriginalInfo(
+            task_id=task_id,
+            task_status="wait",
+            total_count=total_count,
+            active_count=active_count,
+            board_thick=board_thick,
+            board_type=board_type,
+            json_path=filter_json_path,
+            dxf_path=dxf_path,
+            created_time=str(datetime.datetime.now()),
+        )
+        steel_original_info.save()
+
+    def delete(self, request, *args, **kwargs):
+        """删除接口"""
+        request_data = request.data["request_data"]
+        task_list = request_data["task_list"]
+        delete_task_list = []
+        for task_id in task_list:
+            instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
+            task_status = instance.task_status
+            instance.is_delete = 1
+            instance.save()
+            delete_task_list.append(task_id)
+        response_msg = {"task_id": delete_task_list, "msg": "删除成功"}
+        return response_msg
+
+    def put(self, request, *args, **kwargs):
+        """更新接口"""
+        request_data = request.data["request_data"]
+        task_id = request_data["task_id"]
+        update_fields = request_data["update_fields"]
+        instance = models.SteelOriginalInfo.objects.get(task_id=task_id)
+        task_status = instance.task_status
+        instance.__dict__.update(**update_fields)
+        instance.save()
+        response_msg = {"task_id": task_id, "msg": "任务被重置为修改状态"}
+        return response_msg
+
+
 # class MagneticAttraction(APIView):
 #     """磁吸配置接口"""
 #
