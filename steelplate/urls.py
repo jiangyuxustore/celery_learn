@@ -14,17 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, re_path
-from user import views
+from steelplate import views
 
-app_name = "user"  # 指定app_name用户反向生成url
+app_name = "steel"  # 指定app_name用户反向生成url
 
 # URL 最好是以^开头, 以$结尾, 新版django如果URL中包含正则那么需要引入re_path
-urlpatterns = [
-    re_path(r'^v1/register/$', views.Register.as_view()),
-    re_path(r'^v1/email-verify/$', views.EmailVerify.as_view()),
-    re_path(r'^v1/login/$', views.Login.as_view()),
-    re_path(r'^v1/order/$', views.OrderList.as_view()),
-    re_path(r'^v1/order-detail/$', views.OrderDetail.as_view()),
-    re_path(r'^(?P<version>[v1|v2]+)/list/$', views.UserList.as_view(), name="list"),
-    re_path(r'^(?P<version>[v1|v2]+)/detail/(?P<pk>[0-9]+)/$', views.UserInfo.as_view(), name="detail"),
-]
+# urlpatterns = [
+#     re_path(r'^(?P<version>[v1|v2]+)/list/$', views.UserList.as_view(), name="list"),
+#     re_path(r'^(?P<version>[v1|v2]+)/detail/(?P<pk>[0-9]+)/$', views.UserInfo.as_view(), name="detail"),
+# ]

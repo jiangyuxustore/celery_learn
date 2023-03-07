@@ -84,13 +84,12 @@ class TokenAuthentication(BaseAuthentication):
 
 
 class SessionAuthentication(BaseAuthentication):
-
+    """session认证, 如果token过期了, 则使用session认证"""
     def authenticate(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        user = authenticate(username='root', password='Jiangyuxu123...')
-        if user:
-            pass
+        userid = request.session['userid']
+        user = User()
+        user.id = userid
+        return User, None
 
     def authenticate_header(self, request):
         """就算不覆盖也要重写该方法, 不然会报错"""

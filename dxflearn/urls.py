@@ -23,4 +23,5 @@ urlpatterns = [
     path('task/api/', include(('dxf.urls', 'dxf'), namespace='dxf')),
     path('', RedirectView.as_view(url='task/api/v1/main', permanent=True)),
     path('user/api/', include(('user.urls', 'user'), namespace='user')),
+    path('steelplate/api/', include(('steelplate.urls', 'steelplate'), namespace='steelplate'),),
 ]

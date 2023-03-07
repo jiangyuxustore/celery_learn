@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'dxf',
-    'user'
+    'user',
+    "steelplate",
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://124.70.136.165:6379/1",  # 指明使用redis的1号数据库
+        "TIMEOUT": 86400,
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -183,7 +185,7 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
 CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/1'
 
-# ================================rest framework 相关配置 ======================================
+# ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
@@ -192,5 +194,26 @@ REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.FormParser"
-    ]
+    ],
+    # 设置全局访问控制
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle"
+    ],
+    # 匿名用户限制访问是
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "3/min",    # 设置匿名用户1分钟可以访问3次, redis中的key过期时间是60s
+        "burst": "5/min",
+        "sustained": "1000/day"
+    },
+    # 版本控制相关的默认设置
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    "DEFAULT_VERSION": "v1",  # 默认的版本
+    "ALLOWED_VERSIONS": ["v1", "v2"],  # 只允许v1, v2版本, v3版本不在设置中则不允许
+    # 表示URL哪个参数表示version, 比如http://127.0.0.1:8000/api/user?version=v1
+    "VERSION_PARAM": "version",
+
+    # 分页相关的设置
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+
 }
