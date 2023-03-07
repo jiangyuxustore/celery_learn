@@ -187,6 +187,12 @@ CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
 CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3'
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
+# RESULT_BACKEND_TRANSPORT_OPTIONS 是redis断开重连的时间
+RESULT_BACKEND_TRANSPORT_OPTIONS = {
+    'retry_policy': {
+        'timeout': 5.0
+    }
+}
 
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {

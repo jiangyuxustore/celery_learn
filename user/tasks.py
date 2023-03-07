@@ -22,7 +22,8 @@ def send_feedback_email_task(subject, message):
         recipient_list=['jiang.yuxu@mech-mind.net'],
         fail_silently=False
     )
-
+    print("发送邮件成功")
+    return 'success'
 
 # ==============================================基于类的异步任务==================================================
 
@@ -30,13 +31,13 @@ def send_feedback_email_task(subject, message):
 class UserOperator(Task):
     name = "UserOperator"  # 必须要指定一个全局唯一的name属性, 不然celery启动的时候报错
 
-    def run(self, username, password, email, random_uuid,*args, **kwargs):
-        """必须要重写run方法, 这个是继承Task类的主体运行逻辑"""
+    def run(self, username, password, email, random_uuid, *args, **kwargs):
+        """
+        必须要重写run方法, 这个是继承Task类的主体运行逻辑.
+        写数据到mysql也可以用celery去操作, 原因耗时2秒的接口限制直接0.2s就完成了
+        """
+        print("开始插入数据到mysql")
         user = User.objects.create_user(username=username, password=password, email=email, is_active=0)
+        print("数据插入到mysql成功, 用户id:{}".format(user.id))
         return 'success'
 
-    # def __call__(self, *args, **kwargs):
-    #     if self._app is None:
-    #         return self.run(*args, **kwargs)
-    #     else:
-    #         return super(UserOperator, self).__call__(*args, **kwargs)
