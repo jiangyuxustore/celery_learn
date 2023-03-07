@@ -15,6 +15,8 @@ from celery import shared_task
 @shared_task()
 def send_feedback_email_task(subject, message):
     """发送邮件给用户, 进行邮箱验证"""
+    print("发送邮件给用户")
+    sleep(10)
     send_mail(
         subject=subject,
         message=message,

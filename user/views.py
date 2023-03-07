@@ -35,7 +35,7 @@ class Register(APIView):
         # 这里设置session, 待会邮件验证的那个接口会需要用这个userid和random_uuid进行验证
         request.session['userid'] = user.id
         request.session['random_uuid'] = random_uuid
-        send_feedback_email_task(subject="注册验证", message="随机验证码:{}".format(random_uuid))
+        send_feedback_email_task.delay(subject="注册验证", message="随机验证码:{}".format(random_uuid))
         response = redirect("/user/api/v1/email-verify")
         response.set_cookie("userid", user.id)
         return response
