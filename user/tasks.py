@@ -2,7 +2,7 @@
 from time import sleep
 from django.core.mail import send_mail
 from celery import shared_task, Task
-from user.models import User
+from django.contrib.auth.models import User
 
 
 # ==============================================基于函数的异步任务==================================================
