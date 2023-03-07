@@ -34,3 +34,9 @@ class UserOperator(Task):
         """必须要重写run方法, 这个是继承Task类的主体运行逻辑"""
         user = User.objects.create_user(username=username, password=password, email=email, is_active=0)
         return 'success'
+
+    def __call__(self, *args, **kwargs):
+        if self._app is None:
+            return self.run(*args, **kwargs)
+        else:
+            return super(UserOperator, self).__call__(*args, **kwargs)
