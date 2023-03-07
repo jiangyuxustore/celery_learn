@@ -26,9 +26,7 @@ def send_feedback_email_task(subject, message):
 class UserOperator(Task):
     name = "UserOperator"  # 必须要指定一个全局唯一的name属性, 不然celery启动的时候报错
 
-    def run(self, request, username, password, email, random_uuid,*args, **kwargs):
+    def run(self, username, password, email, random_uuid,*args, **kwargs):
         """必须要重写run方法, 这个是继承Task类的主体运行逻辑"""
         user = User.objects.create_user(username=username, password=password, email=email, is_active=0)
-        request.session['userid'] = user.id
-        request.session['random_uuid'] = random_uuid
         return 'success'

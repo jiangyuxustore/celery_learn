@@ -62,7 +62,7 @@ class Register(APIView):
         email = request.data.get("email")
         random_uuid = str(uuid.uuid1())
         user = UserOperator()
-        user.apply_async(args=(request, username, password, email, random_uuid))
+        user.apply_async(args=(username, password, email, random_uuid))
         end_save_time = time.time()
         print("异步数据库插入耗时:{}".format(end_save_time - start_time))
         send_feedback_email_task.delay(subject="注册验证", message="随机验证码:{}".format(random_uuid))
