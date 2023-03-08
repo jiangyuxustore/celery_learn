@@ -22,6 +22,6 @@ class Article(models.Model):
         return self.title
 
     class Meta:
-        order = ['-create_date']
+        ordering = ['-create_date']
         verbose_name = "Article"
         verbose_name_plural = "Article"

@@ -40,9 +40,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'dxf',
     'user',
-    "steelplate",
-    "asyncresult",
-    "blog",
+    'steelplate',
+    'asyncresult',
+    'blog',
 ]
 
 MIDDLEWARE = [
