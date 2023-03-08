@@ -13,17 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
-from django.views.generic import RedirectView
+from django.urls import path, re_path
+from blog import views
 
+app_name = "blog"  # 指定app_name用户反向生成url
 
+# URL 最好是以^开头, 以$结尾, 新版django如果URL中包含正则那么需要引入re_path
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('task/api/', include(('dxf.urls', 'dxf'), namespace='dxf')),
-    path('', RedirectView.as_view(url='task/api/v1/main', permanent=True)),
-    path('user/api/', include(('user.urls', 'user'), namespace='user')),
-    path('steelplate/api/', include(('steelplate.urls', 'steelplate'), namespace='steelplate'),),
-    path('asyncresult/api/', include(('asyncresult.urls', 'asyncresult'), namespace='asyncresult'),),
-    path('blog/api/', include(('blog.urls', 'blog'), namespace='blog'),),
+    re_path(r'^(?P<version>[v1|v2]+)/articles/$', views.ArticleList.as_view(), name="article-list"),
+    re_path(r'^(?P<version>[v1|v2]+)/articles/(?P<pk>[0-9]+)/$', views.ArticleDetail.as_view(), name="article-detail"),
 ]

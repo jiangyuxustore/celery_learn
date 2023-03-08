@@ -22,6 +22,12 @@ class SteelOriginalInfoSerializer(serializers.Serializer):
     is_manual_generate = serializers.IntegerField(default=0)
     is_delete = serializers.IntegerField(default=0)
 
+    def create(self, validated_data):
+        return models.SteelOriginalInfo.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        pass
+
     class Meta:
         model = models.SteelOriginalInfo
         fields = "__all__"

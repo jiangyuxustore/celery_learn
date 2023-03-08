@@ -122,7 +122,7 @@ class PalletNumberPagination(PageNumberPagination):
 #         return response_msg
 #
 #
-class Task(APIView):
+class TaskList(APIView):
     def get(self, request, *args, **kwargs):
         pass
 
