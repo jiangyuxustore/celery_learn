@@ -22,4 +22,7 @@ app_name = "blog"  # 指定app_name用户反向生成url
 urlpatterns = [
     re_path(r'^(?P<version>[v1|v2]+)/articles/$', views.ArticleList.as_view(), name="article-list"),
     re_path(r'^(?P<version>[v1|v2]+)/articles/(?P<pk>[0-9]+)/$', views.ArticleDetail.as_view(), name="article-detail"),
+    re_path(r'^(?P<version>[v1|v2]+)/user-article/$', views.UserArticleList.as_view(), name="user-article-list"),
+    re_path(r'^(?P<version>[v1|v2]+)/user-article/(?P<pk>[0-9]+)/$',
+            views.UserArticleDetail.as_view(), name="user-article-detail"),
 ]
