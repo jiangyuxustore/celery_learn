@@ -10,6 +10,7 @@ from blog.tasks import ArticleOperator
 from blog.models import Article
 from blog.customserializers import ArticleSerializer, UserArticleSerializer, UserSerializer
 from rest_framework.authentication import BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 
 
@@ -35,6 +36,7 @@ class ArticleList(APIView):
 class AsyncArticleList(APIView):
     """同步存储, 当数据存储完成后才返回响应到浏览器"""
     authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         articles = Article.objects.all()
@@ -44,6 +46,7 @@ class AsyncArticleList(APIView):
     def post(self, request, *args, **kwargs):
         data = request.data
         user = request.user.id
+        print(user)
         method = request.method
         async_article_operator = ArticleOperator()
         async_article_operator.apply_async(args=(method, data, user))
