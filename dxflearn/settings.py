@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+from kombu import Queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -194,6 +195,10 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
         'timeout': 5.0
     }
 }
+CELERY_QUEUES = (
+    Queue("web_task", routing_key="web.#")
+)
+
 
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {

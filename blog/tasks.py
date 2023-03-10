@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 
 class ArticleOperator(Task):
     name = "ArticleOperator"
+    queue = "web_task"
 
     def get_object(self, pk):
         return models.Article.objects.get(pk=pk)
