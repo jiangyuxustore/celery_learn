@@ -25,4 +25,5 @@ urlpatterns = [
     re_path(r'^(?P<version>[v1|v2]+)/user-article/$', views.UserArticleList.as_view(), name="user-article-list"),
     re_path(r'^(?P<version>[v1|v2]+)/user-article/(?P<pk>[0-9]+)/$',
             views.UserArticleDetail.as_view(), name="user-article-detail"),
+    re_path(r'^(?P<version>[v1|v2]+)/async-articles/$', views.AsyncArticleList.as_view(), name="async-article-list"),
 ]
