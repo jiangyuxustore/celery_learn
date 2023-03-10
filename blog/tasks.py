@@ -1,5 +1,7 @@
 import django
+import os
 from celery import Task
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 django.setup()
 from blog import customserializers
 from blog import models

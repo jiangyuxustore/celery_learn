@@ -1,8 +1,10 @@
 """异步任务模块"""
 from time import sleep
 import django
+import os
 from django.core.mail import send_mail
 from celery import shared_task, Task
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 django.setup()  # django.setup()指令要在使用django models之前导入
 from django.contrib.auth.models import User
 
