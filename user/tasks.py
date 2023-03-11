@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 
 # ==============================================基于函数的异步任务==================================================
-@shared_task()
+@shared_task(name="user.email")
 def send_feedback_email_task(subject, message):
     """发送邮件给用户, 进行邮箱验证"""
     print("发送邮件给用户")
