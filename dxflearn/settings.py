@@ -10,13 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
-import sys
+
 from pathlib import Path
 from kombu import Queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(BASE_DIR)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -201,10 +201,7 @@ CELERY_QUEUES = (
     Queue("web_task", routing_key="web.#")
 )
 
-CELERY_IMPORTS = (
-    "user.tasks",
-    "blog.tasks",
-)
+
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
