@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
-from blog.tasks import ArticleOperator
+from blog.tasks import ArticleOperator, ClassBaseAdd, function_base_add
 from blog.models import Article
 from blog.customserializers import ArticleSerializer, UserArticleSerializer, UserSerializer
 from rest_framework.authentication import BasicAuthentication
@@ -132,3 +132,14 @@ class UserArticleDetail(APIView):
 
         return Response(serializer.data)
 
+
+class AddView(APIView):
+    """求和异步任务"""
+    def post(self, request, *args, **kwargs):
+        x = request.data.get('x', 0)
+        y = request.data.get('y', 0)
+        class_base_add = ClassBaseAdd()
+        class_base_add.apply_async(x, y)
+        function_base_add.apply_async(x, str(y))
+        msg = {"msg": "求和任务发送成功"}
+        return Response(data=msg)
