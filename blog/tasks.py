@@ -123,7 +123,7 @@ class ClassBaseAdd(Task):
         return result
 
 
-@shared_task(bind=True)
+@shared_task(bind=True, queue='web_task')
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
