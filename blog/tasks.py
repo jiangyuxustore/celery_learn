@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 
 class ArticleOperator(Task):
     name = "ArticleOperator"
-    queue = "web_task"
+    queue = "web_task"  # 指定ArticleOperator将会被发送的队列
 
     def get_object(self, pk):
         return models.Article.objects.get(pk=pk)

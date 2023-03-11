@@ -195,11 +195,15 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
         'timeout': 5.0
     }
 }
+# 定义一个web_task队列
 CELERY_QUEUES = (
     Queue("web_task", routing_key="web.#")
 )
 
-
+CELERY_IMPORTS = (
+    "user.tasks",
+    "blog.tasks",
+)
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
