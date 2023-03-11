@@ -10,7 +10,7 @@ from steelplate.models import SteelOriginalInfo
 
 class SteelOriginalInfoOperator(Task):
 
-    name = "SteelOriginalInfoOperator"
+    name = "steelplate.SteelOriginalInfoOperator"  # 定义task的name时指定namespace=steelplate
 
     def run(self, method, data, *args, **kwargs):
         if method == "POST":

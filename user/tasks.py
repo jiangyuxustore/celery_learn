@@ -29,7 +29,7 @@ def send_feedback_email_task(subject, message):
 
 
 class UserOperator(Task):
-    name = "UserOperator"  # 必须要指定一个全局唯一的name属性, 不然celery启动的时候报错
+    name = "user.UserOperator"  # 定义task的name时指定namespace=user
 
     def run(self, username, password, email, random_uuid, *args, **kwargs):
         """

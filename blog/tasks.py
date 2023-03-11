@@ -10,7 +10,7 @@ from utils.basic_log import log_django
 
 
 class ArticleOperator(Task):
-    name = "ArticleOperator"
+    name = "blog.ArticleOperator"  # 定义task的name时指定namespace=blog
     queue = "web_task"  # 指定ArticleOperator将会被发送的队列
 
     def get_object(self, pk):
