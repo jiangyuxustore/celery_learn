@@ -21,3 +21,4 @@ app.autodiscover_tasks()  # 会自动从django的INSTALLED_APPS中的应用目�
 app.register_task(user_task.UserOperator())  # class base task 需要注册到celery中
 app.register_task(steel_task.SteelOriginalInfoOperator())
 app.register_task(blog_task.ArticleOperator())
+app.register_task(blog_task.ClassBaseAdd())
