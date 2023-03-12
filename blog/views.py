@@ -12,6 +12,7 @@ from blog.customserializers import ArticleSerializer, UserArticleSerializer, Use
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
+from dxflearn.celery import app
 
 
 class ArticleList(APIView):
@@ -139,8 +140,42 @@ class AddView(APIView):
         x = request.data.get('x', 0)
         y = request.data.get('y', 0)
         class_base_add = ClassBaseAdd()
-        class_base_add.apply_async(args=(x, str(y)))
-        function_base_add.apply_async(args=(x, str(y)))
-        function_base_add_v2.apply_async(args=(x, str(y)))
-        msg = {"msg": "求和任务发送成功"}
+        class_instance = class_base_add.apply_async(args=(x, str(y)))
+        function_instance = function_base_add.apply_async(args=(x, str(y)))
+        function_instance_v2 = function_base_add_v2.apply_async(args=(x, str(y)))
+        msg = {
+            "msg": "求和任务发送成功",
+            "class_instance_id": class_instance.task_id,
+            "function_instance_id": function_instance.task_id,
+            "function_instance_v2_id": function_instance_v2.task_id
+        }
         return Response(data=msg)
+
+
+class RemoveTask(APIView):
+    """移除任务, 如果任务已经在执行了则中断任务并移除. 移除的任务可以是单个任务也可以是多个任务组成的list"""
+    def post(self, request, *args, **kwargs):
+        task_id = request.data.get("task_id")
+        if isinstance(task_id, list):
+            print("同时移除多个任务")
+            result = app.control.revoke(task_id, terminate=True)
+        else:
+            print("移除单个任务")
+            result = app.control.revoke(task_id, terminate=True)
+        msg = {"msg": "删除任务成功", "result": result}
+        return Response(data=msg, status=status.HTTP_200_OK)
+
+
+class TerminateTask(APIView):
+    """中断任务, 中断的任务可以是单个任务也可以是多个任务组成的list"""
+    def post(self, request, *args, **kwargs):
+        task_id = request.data.get("task_id")
+        print(task_id)
+        if isinstance(task_id, list):
+            print("同时中断多个任务")
+            result = app.control.terminate(task_id)
+        else:
+            print("中断单个任务")
+            result = app.control.terminate(task_id)
+        msg = {"msg": "中断任务成功", "result": result}
+        return Response(data=msg, status=status.HTTP_200_OK)

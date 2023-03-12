@@ -1,3 +1,5 @@
+import time
+
 import django
 import os
 from celery import shared_task, Task
@@ -126,6 +128,18 @@ class ClassBaseAdd(Task):
         result = x + y
         return result
 
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """
+        class base task失败的时候不会抛出异常, 所以我们可以记录一下异常
+        :param exc:
+        :param task_id:
+        :param args:
+        :param kwargs:
+        :param einfo:
+        :return:
+        """
+        log_django.error("任务运行失败时执行, task_id:{}, einfo:{}".format(task_id, einfo))
+
 
 @shared_task(bind=True, queue='web_task')
 def function_base_add(self, x, y):
@@ -139,6 +153,7 @@ def function_base_add(self, x, y):
     """
     try:
         print('开始计算')
+        time.sleep(10)
         result = x + y
         return result
     except Exception as e:
@@ -156,6 +171,7 @@ def function_base_add(self, x, y):
 # retry_kwargs是失败重试的配置, 这里指定了最大的重试次数是2次, 每次重试之间间隔8s
 @shared_task(bind=True, queue="web_task", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
 def function_base_add_v2(self, x, y):
-    print('开始计算')
+    print('开始计算两个数的和')
+    time.sleep(8)
     result = x + y
     return result
