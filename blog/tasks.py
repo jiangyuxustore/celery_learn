@@ -149,13 +149,13 @@ def function_base_add(self, x, y):
         print('expires:{}'.format(self.request.expires))
         print('hostname:{}'.format(self.request.hostname))
         print('delivery_info:{}'.format(self.request.delivery_info))
-        raise self.retry(max_retries=2, countdown=10)
+        return self.retry(max_retries=2, countdown=10)
 
 
 # 第二种失败重试就是在使用shared_task装饰器的时候，指定autoretry_for这个是你想重试的错误类型列表
 # retry_kwargs是失败重试的配置, 这里指定了最大的重试次数是2次, 每次重试之间间隔8s
 @shared_task(bind=True, queue="web_task", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
-def function_base_add(self, x, y):
+def function_base_add_v2(self, x, y):
     print('开始计算')
     result = x + y
     return result
