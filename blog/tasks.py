@@ -1,16 +1,12 @@
 import django
 import os
 from celery import shared_task, Task
-from celery.utils.log import get_task_logger
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 django.setup()
 from blog import customserializers
 from blog import models
 from django.contrib.auth.models import User
 from utils.basic_log import log_django
-
-
-logger = get_task_logger(__name__)
 
 
 class ArticleOperator(Task):
@@ -104,21 +100,29 @@ class ArticleOperator(Task):
 
 
 class ClassBaseAdd(Task):
+    """
+    第三种失败重试是基于类的, 只需要指定类属性就可以进行失败重试了
+    这里指定了autoretry_for, max_retries, default_retry_delay
+    """
+
     name = "blog.ClassBaseAdd"
     queue = "web_task"
+    autoretry_for = (Exception, )
+    max_retries = 2
+    default_retry_delay = 5
 
     def run(self, x, y, *args, **kwargs):
-        logger.info('origin:{}'.format(self.request.origin))
-        logger.info('retries:{}'.format(self.request.retries))
-        logger.info('expires:{}'.format(self.request.expires))
-        logger.info('hostname:{}'.format(self.request.hostname))
-        logger.info('delivery_info:{}'.format(self.request.delivery_info))
-        logger.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
+        log_django.info('origin:{}'.format(self.request.origin))
+        log_django.info('retries:{}'.format(self.request.retries))
+        log_django.info('expires:{}'.format(self.request.expires))
+        log_django.info('hostname:{}'.format(self.request.hostname))
+        log_django.info('delivery_info:{}'.format(self.request.delivery_info))
+        log_django.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
             self.request.retries,
             self.request.origin,
             self.request.hostname
         ))
-        logger.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
+        log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
         result = x + y
         return result
 
@@ -127,6 +131,7 @@ class ClassBaseAdd(Task):
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
+    第一种失败重试的方式是用try...exception捕获异常, 然后调用self.retry进行重试
     :param self:
     :param x:
     :param y:
@@ -144,5 +149,13 @@ def function_base_add(self, x, y):
         print('expires:{}'.format(self.request.expires))
         print('hostname:{}'.format(self.request.hostname))
         print('delivery_info:{}'.format(self.request.delivery_info))
-        self.retry(max_retries=2, countdown=10, args=self.request.args, kwargs=self.request.kwargs)
+        raise self.retry(max_retries=2, countdown=10)
 
+
+# 第二种失败重试就是在使用shared_task装饰器的时候，指定autoretry_for这个是你想重试的错误类型列表
+# retry_kwargs是失败重试的配置, 这里指定了最大的重试次数是2次, 每次重试之间间隔8s
+@shared_task(bind=True, queue="web_task", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
+def function_base_add(self, x, y):
+    print('开始计算')
+    result = x + y
+    return result

@@ -139,7 +139,7 @@ class AddView(APIView):
         x = request.data.get('x', 0)
         y = request.data.get('y', 0)
         class_base_add = ClassBaseAdd()
-        class_base_add.apply_async(x, y)
-        function_base_add.apply_async(x, str(y))
+        class_base_add.apply_async(args=(x, y))
+        function_base_add.apply_async(args=(x, str(y)))
         msg = {"msg": "求和任务发送成功"}
         return Response(data=msg)
