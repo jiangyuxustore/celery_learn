@@ -200,7 +200,8 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
 CELERY_QUEUES = (
     Queue("web_task", routing_key="web.#")
 )
-
+# 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
+CELERY_IGNORE_RESULT = False
 
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {

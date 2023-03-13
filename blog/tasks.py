@@ -1,5 +1,4 @@
 import time
-
 import django
 import os
 from celery import shared_task, Task
@@ -112,8 +111,10 @@ class ClassBaseAdd(Task):
     autoretry_for = (Exception, )
     max_retries = 2
     default_retry_delay = 5
+    ignore_result = True
 
     def run(self, x, y, *args, **kwargs):
+        self.update_state(state="PROGRESS", meta={'progress': "50%"})  # 通过update_state更新任务的进度
         log_django.info('origin:{}'.format(self.request.origin))
         log_django.info('retries:{}'.format(self.request.retries))
         log_django.info('expires:{}'.format(self.request.expires))
@@ -125,6 +126,9 @@ class ClassBaseAdd(Task):
             self.request.hostname
         ))
         log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
+        time.sleep(2)
+        self.update_state(state="PROGRESS", meta={'progress': "90%"})
+        time.sleep(1)
         result = x + y
         return result
 
