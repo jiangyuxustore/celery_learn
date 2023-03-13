@@ -145,7 +145,16 @@ class ClassBaseAdd(Task):
         log_django.error("任务运行失败时执行, task_id:{}, einfo:{}".format(task_id, einfo))
 
 
-@shared_task(bind=True, queue='web_task')
+def on_failed(self, retval, task_id, args, kwargs):
+    """回调函数还有一种使用方式就是注册到装饰器中"""
+    print('任务执行失败了')
+    print('retval:{}'.format(retval))
+    print('task_id:{}'.format(task_id))
+    print('args:{}'.format(args))
+    print('kwargs:{}'.format(kwargs))
+
+
+@shared_task(bind=True, queue='web_task', on_failed=on_failed)
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
