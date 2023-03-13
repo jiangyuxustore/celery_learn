@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 
 from pathlib import Path
-from kombu import Queue
+from dxflearn.router import default_queue, topic_queue, quorum_queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -198,7 +198,7 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
 }
 # 定义一个web_task队列
 CELERY_QUEUES = (
-    Queue("web_task", routing_key="web.#")
+    default_queue, topic_queue, quorum_queue
 )
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False
