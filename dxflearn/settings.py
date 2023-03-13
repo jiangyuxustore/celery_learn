@@ -187,7 +187,7 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 # ====================================celery 相关配置 ==========================================
 
 # CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
-CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@19.168.146.201:8001'
+CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'
 CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3'
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
