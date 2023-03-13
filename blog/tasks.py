@@ -107,7 +107,7 @@ class ClassBaseAdd(Task):
     """
 
     name = "blog.ClassBaseAdd"
-    queue = "web_task"
+    queue = "topic_queue"
     autoretry_for = (Exception, )
     max_retries = 2
     default_retry_delay = 5
@@ -154,7 +154,7 @@ def on_failed(self, retval, task_id, args, kwargs):
     print('kwargs:{}'.format(kwargs))
 
 
-@shared_task(name='blog.function_base_add', bind=True, queue='web_task', on_failed=on_failed)
+@shared_task(name='blog.function_base_add', bind=True, queue='topic_queue', on_failed=on_failed)
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
@@ -182,7 +182,7 @@ def function_base_add(self, x, y):
 
 # 第二种失败重试就是在使用shared_task装饰器的时候，指定autoretry_for这个是你想重试的错误类型列表
 # retry_kwargs是失败重试的配置, 这里指定了最大的重试次数是2次, 每次重试之间间隔8s
-@shared_task(name='blog.function_base_add_v2', bind=True, queue="web_task", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
+@shared_task(name='blog.function_base_add_v2', bind=True, queue="topic_queue", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
 def function_base_add_v2(self, x, y):
     print('开始计算两个数的和')
     time.sleep(8)
