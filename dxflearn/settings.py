@@ -10,9 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
-
+from kombu import Queue, Exchange
 from pathlib import Path
-from dxflearn.router import default_queue, topic_queue, quorum_queue
+# from dxflearn.router import default_queue, topic_queue, quorum_queue
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -198,8 +198,28 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
     }
 }
 # 定义一个web_task队列
+# CELERY_QUEUES = (
+#     default_queue, topic_queue, quorum_queue
+# )
 CELERY_QUEUES = (
-    default_queue, topic_queue, quorum_queue
+    Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
+          durable=True, auto_delete=True,
+          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic'}),
+    Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
+          bindings="user.#", durable=True, auto_delete=True,
+          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
+    Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
+          bindings="blog.#",
+          queue_arguments={
+             'x-queue-type': 'quorum',
+             'x-max-length': 2000000,
+             'x-overflow': 'reject_publish',
+             'x-delivery-limit': 2,
+             "x-queue-lead-locator": "balanced",
+             # "x-dead-letter-exchange": "dead_letter_exchange",
+             # "x-dead-letter-routing-key": "dead_letter_routing_key"
+         })
+
 )
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False
