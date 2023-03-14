@@ -5,17 +5,37 @@
 @Time ： 2023/3/1 16:41
 """
 import os
-from celery import Celery
+from celery import Celery, bootsteps
 from kombu import Queue, Exchange
+from kombu.common import QoS
 from user import tasks as user_task
 from steelplate import tasks as steel_task
 from blog import tasks as blog_task
+
+
+class NoChannelGlobalQoS(bootsteps.StartStopStep):
+    requires = {'celery.worker.consumer.tasks:Tasks'}
+
+    def start(self, c):
+        qos_global = False
+
+        c.connection.default_channel.basic_qos(
+            0, c.initial_prefetch_count, qos_global,
+        )
+
+        def set_prefetch_count(prefetch_count):
+            return c.task_consumer.qos(
+                prefetch_count=prefetch_count,
+                apply_global=qos_global,
+            )
+        c.qos = QoS(set_prefetch_count, c.initial_prefetch_count)
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
 # 这个的namespace大写, 那就意味着在django的settings.py中有关celery的配置都要大写
 app.config_from_object("django.conf:settings", namespace="CELERY")
+app.steps['consumer'].add(NoChannelGlobalQoS)
 queue = (
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
