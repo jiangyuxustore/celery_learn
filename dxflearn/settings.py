@@ -203,28 +203,28 @@ CELERYD_PREFETCH_MULTIPLIER = 3  # 设置worker的预取消息数
 # CELERY_QUEUES = (
 #     default_queue, topic_queue, quorum_queue
 # )
-CELERY_QUEUES = (
-    Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
-          durable=True, auto_delete=True,
-          queue_arguments={'x-queue-type': 'classic'}),
-    Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
-          bindings="user.#", durable=True, auto_delete=True,
-          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
-    Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
-          bindings="blog.#",
-          queue_arguments={
-             'x-queue-type': 'quorum',
-             'x-max-length': 2000000,
-             'x-overflow': 'reject_publish',
-             'x-delivery-limit': 2,
-             "x-queue-lead-locator": "balanced",
-             # "x-dead-letter-exchange": "dead_letter_exchange",
-             # "x-dead-letter-routing-key": "dead_letter_routing_key"
-         })
-
-)
-CELERY_DEFAULT_EXCHANGE = "quorum_exchange"
-CELERY_DEFAULT_EXCHANGE_TYPE = "topic"
+# CELERY_QUEUES = (
+#     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
+#           durable=True, auto_delete=True,
+#           queue_arguments={'x-queue-type': 'classic'}),
+#     Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
+#           bindings="user.#", durable=True, auto_delete=True,
+#           queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
+#     Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
+#           bindings="blog.#",
+#           queue_arguments={
+#              'x-queue-type': 'quorum',
+#              'x-max-length': 2000000,
+#              'x-overflow': 'reject_publish',
+#              'x-delivery-limit': 2,
+#              "x-queue-lead-locator": "balanced",
+#              # "x-dead-letter-exchange": "dead_letter_exchange",
+#              # "x-dead-letter-routing-key": "dead_letter_routing_key"
+#          })
+#
+# )
+# CELERY_DEFAULT_EXCHANGE = "quorum_exchange"
+# CELERY_DEFAULT_EXCHANGE_TYPE = "topic"
 
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False

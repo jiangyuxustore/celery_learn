@@ -6,6 +6,7 @@
 """
 import os
 from celery import Celery
+from kombu import Queue, Exchange
 from user import tasks as user_task
 from steelplate import tasks as steel_task
 from blog import tasks as blog_task
@@ -15,6 +16,27 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
 # 这个的namespace大写, 那就意味着在django的settings.py中有关celery的配置都要大写
 app.config_from_object("django.conf:settings", namespace="CELERY")
+queue = (
+    Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
+          durable=True, auto_delete=True,
+          queue_arguments={'x-queue-type': 'classic'}),
+    Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
+          bindings="user.#", durable=True, auto_delete=True,
+          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
+    Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
+          bindings="blog.#",
+          queue_arguments={
+             'x-queue-type': 'quorum',
+             'x-max-length': 2000000,
+             'x-overflow': 'reject_publish',
+             'x-delivery-limit': 2,
+             "x-queue-lead-locator": "balanced",
+             # "x-dead-letter-exchange": "dead_letter_exchange",
+             # "x-dead-letter-routing-key": "dead_letter_routing_key"
+         })
+)
+app.conf.update(CELERY_QUEUES=queue)
+
 # 要使 app.autodiscover_tasks() 自动加载celery任务, 需要在 Django 的每个应用程序内的单独创建
 # tasks.py 模块, 并在tasks.py中中定义 Celery 任务
 app.autodiscover_tasks()  # 会自动从django的INSTALLED_APPS中的应用目录下加载tasks.py
