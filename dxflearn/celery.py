@@ -27,7 +27,7 @@ queue = (
           queue_arguments={
              'x-queue-type': 'quorum',
              'x-max-length': 2000000,
-             'x-overflow': 'reject_publish',
+             # 'x-overflow': 'reject_publish',
              'x-delivery-limit': 2,
              "x-queue-lead-locator": "balanced",
              # "x-dead-letter-exchange": "dead_letter_exchange",
