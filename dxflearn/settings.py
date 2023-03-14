@@ -197,6 +197,8 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
         'timeout': 5.0
     }
 }
+CELERY_ACKS_LATE = True
+CELERYD_PREFETCH_MULTIPLIER = 3  # 设置worker的预取消息数
 # 定义一个web_task队列
 # CELERY_QUEUES = (
 #     default_queue, topic_queue, quorum_queue
@@ -204,7 +206,7 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
 CELERY_QUEUES = (
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
-          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic'}),
+          queue_arguments={'x-queue-type': 'classic'}),
     Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
           bindings="user.#", durable=True, auto_delete=True,
           queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
