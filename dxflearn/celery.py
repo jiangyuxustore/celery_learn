@@ -26,10 +26,10 @@ queue = (
     Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
           queue_arguments={
              'x-queue-type': 'quorum',
-             'x-max-length': 2000000,
+             # 'x-max-length': 2000000,
              # 'x-overflow': 'reject_publish',
-             'x-delivery-limit': 2,
-             "x-queue-lead-locator": "balanced",
+             # 'x-delivery-limit': 2,
+             # "x-queue-lead-locator": "balanced",
              # "x-dead-letter-exchange": "dead_letter_exchange",
              # "x-dead-letter-routing-key": "dead_letter_routing_key"
          })
