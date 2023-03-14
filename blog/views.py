@@ -140,9 +140,9 @@ class AddView(APIView):
         x = request.data.get('x', 0)
         y = request.data.get('y', 0)
         class_base_add = ClassBaseAdd()
-        class_instance = class_base_add.apply_async(args=(x, str(y)), queue='topic_queue', routing_key="blog.ClassBaseAdd")
-        function_instance = function_base_add.apply_async(args=(x, str(y)), queue='topic_queue', routing_key="blog.function_base_add")
-        function_instance_v2 = function_base_add_v2.apply_async(args=(x, str(y)), queue='topic_queue', routing_key="blog.function_base_add_v2")
+        class_instance = class_base_add.apply_async(args=(x, str(y)), queue='quorum_queue', routing_key="blog.ClassBaseAdd")
+        function_instance = function_base_add.apply_async(args=(x, str(y)), queue='quorum_queue', routing_key="blog.function_base_add")
+        function_instance_v2 = function_base_add_v2.apply_async(args=(x, str(y)), queue='quorum_queue', routing_key="blog.function_base_add_v2")
         msg = {
             "msg": "求和任务发送成功",
             "class_instance_id": class_instance.task_id,

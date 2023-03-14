@@ -9,7 +9,7 @@ topic_exchange = Exchange("topic_exchange", type="topic")
 topic_queue = Queue("topic_queue", exchange=topic_exchange, routing_key="user.#", durable=True, auto_delete=True,
                     queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000})
 
-quorum_queue = Queue("topic_queue", exchange=topic_exchange, routing_key="blog.#",
+quorum_queue = Queue("quorum_queue", exchange=topic_exchange, routing_key="blog.#",
                      queue_arguments={
                          'x-queue-type': 'quorum',
                          'x-max-length': 2000000,
