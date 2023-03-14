@@ -221,6 +221,9 @@ CELERY_QUEUES = (
          })
 
 )
+CELERY_DEFAULT_EXCHANGE = "quorum_exchange"
+CELERY_DEFAULT_EXCHANGE_TYPE = "topic"
+
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False
 
