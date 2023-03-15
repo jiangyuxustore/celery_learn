@@ -72,6 +72,8 @@ app.conf.task_default_priority = 5  # 队列的默认优先级
 app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
+app.conf.task_time_limit = 10
+app.conf.task_soft_time_limit = 5
 # 除了按照上面的task_name一一映射exchange外, 还可以通过正则表达式进行映射，
 # 以blog开头的task_name都会被发送到quorum_exchange中, 同时携带的routing_key是blog.task
 # 以user开头的task_name都会被发送到topic_exchange中, 通过携带的routing_key时user.task
