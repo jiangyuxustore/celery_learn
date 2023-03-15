@@ -63,8 +63,6 @@ queue = (
              # 'x-overflow': 'reject_publish',
              # 'x-delivery-limit': 2,
              # "x-queue-lead-locator": "balanced",
-             "x-dead-letter-exchange": "dead_letter_exchange",
-             "x-dead-letter-routing-key": "dead_letter"
          }),
 
 )
