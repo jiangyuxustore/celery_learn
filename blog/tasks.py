@@ -2,6 +2,7 @@ import time
 import django
 import os
 from celery import shared_task, Task
+from celery.exceptions import SoftTimeLimitExceeded, Reject
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 django.setup()
 from blog import customserializers
@@ -114,23 +115,29 @@ class ClassBaseAdd(Task):
     ignore_result = True
 
     def run(self, x, y, *args, **kwargs):
-        self.update_state(state="PROGRESS", meta={'progress': "50%"})  # 通过update_state更新任务的进度
-        log_django.info('origin:{}'.format(self.request.origin))
-        log_django.info('retries:{}'.format(self.request.retries))
-        log_django.info('expires:{}'.format(self.request.expires))
-        log_django.info('hostname:{}'.format(self.request.hostname))
-        log_django.info('delivery_info:{}'.format(self.request.delivery_info))
-        log_django.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
-            self.request.retries,
-            self.request.origin,
-            self.request.hostname
-        ))
-        log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
-        time.sleep(2)
-        self.update_state(state="PROGRESS", meta={'progress': "90%"})
-        time.sleep(1)
-        result = x + y
-        return result
+        try:
+            print("ClassBaseAdd开始执行")
+            self.update_state(state="PROGRESS", meta={'progress': "50%"})  # 通过update_state更新任务的进度
+            log_django.info('origin:{}'.format(self.request.origin))
+            log_django.info('retries:{}'.format(self.request.retries))
+            log_django.info('expires:{}'.format(self.request.expires))
+            log_django.info('hostname:{}'.format(self.request.hostname))
+            log_django.info('delivery_info:{}'.format(self.request.delivery_info))
+            log_django.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
+                self.request.retries,
+                self.request.origin,
+                self.request.hostname
+            ))
+            log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
+            time.sleep(8)
+            self.update_state(state="PROGRESS", meta={'progress': "90%"})
+            time.sleep(1)
+            result = x + y
+            print("ClassBaseAdd执行结束")
+            return result
+        except SoftTimeLimitExceeded:  # 当触发软超时就直接将数据发送给至死信队列中
+            print('触发软超时')
+            raise Reject("task execute timeout", requeue=False)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """
@@ -148,10 +155,6 @@ class ClassBaseAdd(Task):
 def on_failed(self, retval, task_id, args, kwargs):
     """回调函数还有一种使用方式就是注册到装饰器中"""
     print('任务执行失败了')
-    print('retval:{}'.format(retval))
-    print('task_id:{}'.format(task_id))
-    print('args:{}'.format(args))
-    print('kwargs:{}'.format(kwargs))
 
 
 @shared_task(name='blog.function_base_add', bind=True, queue='topic_queue', on_failed=on_failed)
@@ -165,18 +168,16 @@ def function_base_add(self, x, y):
     :return:
     """
     try:
-        print('开始计算')
+        print('function_base_add开始执行')
         time.sleep(10)
         result = x + y
+        print('function_base_add执行结束')
         return result
     except Exception as e:
         print('args:{}'.format(self.request.args))
         print('kwargs:{}'.format(self.request.kwargs))
-        print('origin:{}'.format(self.request.origin))
         print('retries:{}'.format(self.request.retries))
-        print('expires:{}'.format(self.request.expires))
         print('hostname:{}'.format(self.request.hostname))
-        print('delivery_info:{}'.format(self.request.delivery_info))
         return self.retry(max_retries=2, countdown=10)
 
 
@@ -184,7 +185,8 @@ def function_base_add(self, x, y):
 # retry_kwargs是失败重试的配置, 这里指定了最大的重试次数是2次, 每次重试之间间隔8s
 @shared_task(name='blog.function_base_add_v2', bind=True, queue="topic_queue", autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
 def function_base_add_v2(self, x, y):
-    print('开始计算两个数的和')
+    print('function_base_add_v2开始执行')
     time.sleep(8)
     result = x + y
+    print('function_base_add_v2执行结束')
     return result

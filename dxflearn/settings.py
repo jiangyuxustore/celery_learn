@@ -223,6 +223,8 @@ CELERYD_PREFETCH_MULTIPLIER = 3  # 设置worker的预取消息数
 
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False
+CELERYD_TIME_LIMIT = 10
+CELERYD_SOFT_TIME_LIMIT = 5
 
 # ================================rest framework 的全局配置 ======================================
 REST_FRAMEWORK = {

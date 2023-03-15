@@ -42,10 +42,14 @@ app.steps['consumer'].add(NoChannelGlobalQoS)
 queue = (
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
-          queue_arguments={'x-queue-type': 'classic'}),
+          queue_arguments={'x-queue-type': 'classic', 'x-dead-letter-exchange': 'dead_letter_exchange',
+                           'x-dead-letter-routing-key': 'dead_letter'}),
     Queue("topic_queue", exchange=Exchange("topic_exchange", type="topic"), routing_key="user.#",
           durable=True, auto_delete=True,
-          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000}),
+          queue_arguments={'x-max-priority': 10, 'x-queue-type': 'classic', 'x-max-length': 2000000,
+                           'x-dead-letter-exchange': 'dead_letter_exchange',
+                           'x-dead-letter-routing-key': 'dead_letter'
+                           }),
     Queue("quorum_queue", exchange=Exchange("quorum_exchange", type="topic"), routing_key="blog.#",
           queue_arguments={
              'x-queue-type': 'quorum',
@@ -53,9 +57,15 @@ queue = (
              # 'x-overflow': 'reject_publish',
              # 'x-delivery-limit': 2,
              # "x-queue-lead-locator": "balanced",
-             # "x-dead-letter-exchange": "dead_letter_exchange",
-             # "x-dead-letter-routing-key": "dead_letter_routing_key"
-         })
+             "x-dead-letter-exchange": "dead_letter_exchange",
+             "x-dead-letter-routing-key": "dead_letter"
+         }),
+    Queue("dead_letter_queue", exchange=Exchange("dead_letter_exchange", type="direct"), routing_key="dead_letter",
+          queue_arguments={
+              'x-queue-type': 'classic',
+              'x-max-length': 2000000,
+              'x-overflow': 'drop-head',
+          }),
 )
 app.conf.update(CELERY_QUEUES=queue)
 app.conf.task_queue_max_priority = 10  # 队列的最大优先级
@@ -63,10 +73,19 @@ app.conf.task_default_priority = 5  # 队列的默认优先级
 app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
+# 除了按照上面的task_name一一映射exchange外, 还可以通过正则表达式进行映射，
+# 以blog开头的task_name都会被发送到quorum_exchange中, 同时携带的routing_key是blog.task
+# 以user开头的task_name都会被发送到topic_exchange中, 通过携带的routing_key时user.task
 app.conf.task_routes = {
     'blog.*': {
         'exchange': 'quorum_exchange',
         'routing_key': 'blog.task',
+        'priority': 10,
+    },
+    'user.*': {
+        'exchange': 'topic_exchange',
+        'routing_key': 'user.task',
+        'priority': 10,
     },
 }
 
