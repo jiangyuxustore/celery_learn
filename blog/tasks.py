@@ -106,7 +106,7 @@ class ClassBaseAdd(Task):
     第三种失败重试是基于类的, 只需要指定类属性就可以进行失败重试了
     这里指定了autoretry_for, max_retries, default_retry_delay
     """
-    ack_late = True
+    acks_late = True
     name = "blog.ClassBaseAdd"
     autoretry_for = (Exception, )
     max_retries = 2
@@ -156,7 +156,7 @@ def on_failed(self, retval, task_id, args, kwargs):
     print('任务执行失败了')
 
 
-@shared_task(name='blog.function_base_add', bind=True, ack_late=True, on_failed=on_failed)
+@shared_task(name='blog.function_base_add', bind=True, acks_late=True, on_failed=on_failed)
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
