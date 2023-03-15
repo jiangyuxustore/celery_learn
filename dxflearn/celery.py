@@ -41,6 +41,12 @@ app.steps['consumer'].add(NoChannelGlobalQoS)
 
 
 queue = (
+    Queue("dead_letter_queue", exchange=Exchange("dead_letter_exchange", type="direct"), routing_key="dead_letter",
+          queue_arguments={
+              'x-queue-type': 'classic',
+              'x-max-length': 2000000,
+              'x-overflow': 'drop-head',
+          }),
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
           queue_arguments={'x-queue-type': 'classic', 'x-dead-letter-exchange': 'dead_letter_exchange',
