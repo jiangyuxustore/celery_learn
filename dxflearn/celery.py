@@ -63,7 +63,7 @@ app.conf.task_default_priority = 5  # 队列的默认优先级
 app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
-app.conf.task_routers = {
+app.conf.task_routes = {
     'blog.ClassBaseAdd': {
         'exchange': 'quorum_exchange',
         'routing_key': 'blog.ClassBaseAdd',
