@@ -115,29 +115,25 @@ class ClassBaseAdd(Task):
     ignore_result = True
 
     def run(self, x, y, *args, **kwargs):
-        try:
-            print("ClassBaseAdd开始执行")
-            self.update_state(state="PROGRESS", meta={'progress': "50%"})  # 通过update_state更新任务的进度
-            log_django.info('origin:{}'.format(self.request.origin))
-            log_django.info('retries:{}'.format(self.request.retries))
-            log_django.info('expires:{}'.format(self.request.expires))
-            log_django.info('hostname:{}'.format(self.request.hostname))
-            log_django.info('delivery_info:{}'.format(self.request.delivery_info))
-            log_django.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
-                self.request.retries,
-                self.request.origin,
-                self.request.hostname
-            ))
-            log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
-            time.sleep(8)
-            self.update_state(state="PROGRESS", meta={'progress': "90%"})
-            time.sleep(1)
-            result = x + y
-            print("ClassBaseAdd执行结束")
-            return result
-        except SoftTimeLimitExceeded:  # 当触发软超时就直接将数据发送给至死信队列中
-            print('触发软超时')
-            raise Reject("task execute timeout", requeue=False)
+        print("ClassBaseAdd开始执行")
+        self.update_state(state="PROGRESS", meta={'progress': "50%"})  # 通过update_state更新任务的进度
+        log_django.info('origin:{}'.format(self.request.origin))
+        log_django.info('retries:{}'.format(self.request.retries))
+        log_django.info('expires:{}'.format(self.request.expires))
+        log_django.info('hostname:{}'.format(self.request.hostname))
+        log_django.info('delivery_info:{}'.format(self.request.delivery_info))
+        log_django.info('开始计算整数相加任务, 当前任务执行次数:{}, 任务由:{}发送, 执行任务的node name:{}'.format(
+            self.request.retries,
+            self.request.origin,
+            self.request.hostname
+        ))
+        log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
+        time.sleep(8)
+        self.update_state(state="PROGRESS", meta={'progress': "90%"})
+        time.sleep(1)
+        result = x + y
+        print("ClassBaseAdd执行结束")
+        return result
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         """
@@ -173,6 +169,9 @@ def function_base_add(self, x, y):
         result = x + y
         print('function_base_add执行结束')
         return result
+    except SoftTimeLimitExceeded:  # 当触发软超时就直接将数据发送给至死信队列中
+        print('触发软超时')
+        raise Reject("task execute timeout", requeue=False)
     except Exception as e:
         print('args:{}'.format(self.request.args))
         print('kwargs:{}'.format(self.request.kwargs))

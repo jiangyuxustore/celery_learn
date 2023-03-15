@@ -144,7 +144,7 @@ class AddView(APIView):
         class_instance_quorum = class_base_add.apply_async(args=(x, y))
         # function_base_add.apply_async指定exchange和routing_key则优先使用apply_async中的
         function_instance = function_base_add.apply_async(
-            args=(x, str(y)),
+            args=(x, y),
             exchange="topic_exchange",
             routing_key="user.function_base_add"
         )
