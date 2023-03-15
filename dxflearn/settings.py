@@ -199,10 +199,7 @@ RESULT_BACKEND_TRANSPORT_OPTIONS = {
 }
 CELERY_ACKS_LATE = True
 CELERYD_PREFETCH_MULTIPLIER = 3  # 设置worker的预取消息数
-# 定义一个web_task队列
-# CELERY_QUEUES = (
-#     default_queue, topic_queue, quorum_queue
-# )
+# # 官网上定义队列都是定义在CELERY_QUEUES中, 但这种设置并不生效,
 # CELERY_QUEUES = (
 #     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
 #           durable=True, auto_delete=True,
@@ -223,8 +220,6 @@ CELERYD_PREFETCH_MULTIPLIER = 3  # 设置worker的预取消息数
 #          })
 #
 # )
-# CELERY_DEFAULT_EXCHANGE = "quorum_exchange"
-# CELERY_DEFAULT_EXCHANGE_TYPE = "topic"
 
 # 设置全局都不忽略task的结果, 也就是要保存task的结果, 类和函数上ignore_result优先级比这个全局的要高
 CELERY_IGNORE_RESULT = False

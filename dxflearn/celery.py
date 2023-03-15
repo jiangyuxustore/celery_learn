@@ -14,6 +14,7 @@ from blog import tasks as blog_task
 
 
 class NoChannelGlobalQoS(bootsteps.StartStopStep):
+    """celery使用quorum_queue时需要设置qos_global=False"""
     requires = {'celery.worker.consumer.tasks:Tasks'}
 
     def start(self, c):
@@ -35,7 +36,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
 # 这个的namespace大写, 那就意味着在django的settings.py中有关celery的配置都要大写
 app.config_from_object("django.conf:settings", namespace="CELERY")
+# 使用quorum_queue时需要更改consumers的配置
 app.steps['consumer'].add(NoChannelGlobalQoS)
+
 queue = (
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
@@ -55,6 +58,11 @@ queue = (
          })
 )
 app.conf.update(CELERY_QUEUES=queue)
+app.conf.task_queue_max_priority = 10  # 队列的最大优先级
+app.conf.task_default_priority = 5  # 队列的默认优先级
+app.conf.task_default_queue = "default_queue"
+app.conf.task_default_exchange = "default_exchange"
+app.conf.task_default_routing_key = "default"
 
 # 要使 app.autodiscover_tasks() 自动加载celery任务, 需要在 Django 的每个应用程序内的单独创建
 # tasks.py 模块, 并在tasks.py中中定义 Celery 任务
