@@ -63,6 +63,20 @@ app.conf.task_default_priority = 5  # 队列的默认优先级
 app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
+app.conf.task_routers = {
+    'blog.ClassBaseAdd': {
+        'exchange': 'quorum_exchange',
+        'routing_key': 'blog.ClassBaseAdd',
+    },
+    'blog.function_base_add': {
+        'exchange': 'quorum_exchange',
+        'routing_key': 'blog.function_base_add',
+    },
+    'blog.function_base_add_v2': {
+        'exchange': 'quorum_exchange',
+        'routing_key': 'blog.function_base_add_v2',
+    },
+}
 
 # 要使 app.autodiscover_tasks() 自动加载celery任务, 需要在 Django 的每个应用程序内的单独创建
 # tasks.py 模块, 并在tasks.py中中定义 Celery 任务

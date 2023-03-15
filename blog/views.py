@@ -143,11 +143,17 @@ class AddView(APIView):
         class_instance = class_base_add.apply_async(args=(x, str(y)), exchange="topic_exchange", routing_key="user.ClassBaseAdd")
         function_instance = function_base_add.apply_async(args=(x, str(y)), exchange="topic_exchange",  routing_key="user.function_base_add")
         function_instance_v2 = function_base_add_v2.apply_async(args=(x, str(y)), exchange="topic_exchange", routing_key="user.function_base_add_v2")
+        class_instance_quorum = class_base_add.apply_async(args=(x, y))
+        function_instance_quorum = function_base_add.apply_async(args=(x, y))
+        function_instance_v2_quorum = function_base_add_v2.apply_async(args=(x, y))
         msg = {
             "msg": "求和任务发送成功",
             "class_instance_id": class_instance.task_id,
             "function_instance_id": function_instance.task_id,
-            "function_instance_v2_id": function_instance_v2.task_id
+            "function_instance_v2_id": function_instance_v2.task_id,
+            "class_instance_quorum_id": class_instance_quorum.task_id,
+            "function_instance_quorum_id": function_instance_quorum.task_id,
+            "function_instance_v2_quorum_id": function_instance_v2_quorum.task_id,
         }
         return Response(data=msg)
 
