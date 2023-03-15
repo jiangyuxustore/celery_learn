@@ -31,21 +31,6 @@ class NoChannelGlobalQoS(bootsteps.StartStopStep):
             )
         c.qos = QoS(set_prefetch_count, c.initial_prefetch_count)
 
-class DeclareDLXnDLQ(bootsteps.StartStopStep):
-    """
-    Celery Bootstep to declare the DL exchange and queues before the worker starts
-        processing tasks
-    """
-    requires = {'celery.worker.components:Pool'}
-
-    def start(self, worker):
-        app = worker.app
-        dlx = Exchange("dead_letter_exchange", type='direct')
-        dead_letter_queue = Queue("dead_letter_queue", dlx, routing_key="dead_letter")
-
-        with worker.app.pool.acquire() as conn:
-            dead_letter_queue.bind(conn).declare()
-
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
@@ -53,7 +38,7 @@ app = Celery("django_celery")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 # 使用quorum_queue时需要更改consumers的配置
 app.steps['consumer'].add(NoChannelGlobalQoS)
-app.steps['worker'].add(DeclareDLXnDLQ)
+
 
 queue = (
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
@@ -82,8 +67,8 @@ app.conf.task_default_priority = 5  # 队列的默认优先级
 app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
-app.conf.task_time_limit = 10
-app.conf.task_soft_time_limit = 5
+app.conf.task_time_limit = 10  # 设置celery的硬超时时间
+app.conf.task_soft_time_limit = 5  # 设置celery的软超时时间
 # 除了按照上面的task_name一一映射exchange外, 还可以通过正则表达式进行映射，
 # 以blog开头的task_name都会被发送到quorum_exchange中, 同时携带的routing_key是blog.task
 # 以user开头的task_name都会被发送到topic_exchange中, 通过携带的routing_key时user.task

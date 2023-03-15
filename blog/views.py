@@ -141,7 +141,11 @@ class AddView(APIView):
         y = request.data.get('y', 0)
         class_base_add = ClassBaseAdd()
         # class_base_add.apply_async没有指定exchange和routing_key则用task_routes中的
-        class_instance_quorum = class_base_add.apply_async(args=(x, y))
+        class_instance_quorum = class_base_add.apply_async(
+            args=(x, y),
+            exchange="topic_exchange",
+            routing_key="user.class_base_add"
+            )
         # function_base_add.apply_async指定exchange和routing_key则优先使用apply_async中的
         function_instance = function_base_add.apply_async(
             args=(x, y),
