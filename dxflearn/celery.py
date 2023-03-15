@@ -31,6 +31,21 @@ class NoChannelGlobalQoS(bootsteps.StartStopStep):
             )
         c.qos = QoS(set_prefetch_count, c.initial_prefetch_count)
 
+class DeclareDLXnDLQ(bootsteps.StartStopStep):
+    """
+    Celery Bootstep to declare the DL exchange and queues before the worker starts
+        processing tasks
+    """
+    requires = {'celery.worker.components:Pool'}
+
+    def start(self, worker):
+        app = worker.app
+        dlx = Exchange("dead_letter_exchange", type='direct')
+        dead_letter_queue = Queue("dead_letter_queue", dlx, routing_key="dead_letter")
+
+        with worker.app.pool.acquire() as conn:
+            dead_letter_queue.bind(conn).declare()
+
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 app = Celery("django_celery")
@@ -38,14 +53,9 @@ app = Celery("django_celery")
 app.config_from_object("django.conf:settings", namespace="CELERY")
 # 使用quorum_queue时需要更改consumers的配置
 app.steps['consumer'].add(NoChannelGlobalQoS)
+app.steps['worker'].add(DeclareDLXnDLQ)
 
 queue = (
-    Queue("dead_letter_queue", exchange=Exchange("dead_letter_exchange", type="direct"), routing_key="dead_letter",
-          queue_arguments={
-              'x-queue-type': 'classic',
-              'x-max-length': 2000000,
-              'x-overflow': 'drop-head',
-          }),
     Queue("default_queue", exchange=Exchange("default_exchange", type='direct'), routing_key="default",
           durable=True, auto_delete=True,
           queue_arguments={'x-queue-type': 'classic', 'x-dead-letter-exchange': 'dead_letter_exchange',
