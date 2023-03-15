@@ -64,17 +64,9 @@ app.conf.task_default_queue = "default_queue"
 app.conf.task_default_exchange = "default_exchange"
 app.conf.task_default_routing_key = "default"
 app.conf.task_routes = {
-    'blog.ClassBaseAdd': {
+    'blog.*': {
         'exchange': 'quorum_exchange',
-        'routing_key': 'blog.ClassBaseAdd',
-    },
-    'blog.function_base_add': {
-        'exchange': 'quorum_exchange',
-        'routing_key': 'blog.function_base_add',
-    },
-    'blog.function_base_add_v2': {
-        'exchange': 'quorum_exchange',
-        'routing_key': 'blog.function_base_add_v2',
+        'routing_key': 'blog.task',
     },
 }
 
