@@ -172,12 +172,6 @@ def function_base_add(self, x, y):
     except SoftTimeLimitExceeded:  # 当触发软超时就直接将数据发送给至死信队列中
         print('触发软超时')
         raise Reject("task execute timeout", requeue=False)
-    except Exception as e:
-        print('args:{}'.format(self.request.args))
-        print('kwargs:{}'.format(self.request.kwargs))
-        print('retries:{}'.format(self.request.retries))
-        print('hostname:{}'.format(self.request.hostname))
-        return self.retry(max_retries=2, countdown=10)
 
 
 # 第二种失败重试就是在使用shared_task装饰器的时候，指定autoretry_for这个是你想重试的错误类型列表
