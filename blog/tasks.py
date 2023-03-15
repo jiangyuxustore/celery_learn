@@ -156,7 +156,7 @@ def on_failed(self, retval, task_id, args, kwargs):
     print('任务执行失败了')
 
 
-@shared_task(name='blog.function_base_add', bind=True, acks_late=True, autoretry_for=(Exception, ), on_failed=on_failed)
+@shared_task(name='blog.function_base_add', bind=True, autoretry_for=(Exception, ), on_failed=on_failed)
 def function_base_add(self, x, y):
     """
     bind=True, 则第一个参数就是class base task中的self实例, 然后你在下面就可以用self.retry了
@@ -166,15 +166,11 @@ def function_base_add(self, x, y):
     :param y:
     :return:
     """
-    try:
-        print('function_base_add开始执行')
-        time.sleep(10)
-        result = x + y
-        print('function_base_add执行结束')
-        return result
-    except SoftTimeLimitExceeded:  # 当触发软超时就直接将数据发送给至死信队列中
-        print('触发软超时')
-        raise Reject("task execute timeout", requeue=False)
+    print('function_base_add开始执行')
+    time.sleep(10)
+    result = x + y
+    print('function_base_add执行结束')
+    return result
 
 
 # 第二种失败重试就是在使用shared_task装饰器的时候，指定autoretry_for这个是你想重试的错误类型列表
