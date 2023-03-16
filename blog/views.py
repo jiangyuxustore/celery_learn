@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
-from blog.tasks import ArticleOperator, ClassBaseAdd, function_base_add, function_base_add_v2
+from blog.tasks import ArticleOperator, ClassBaseAdd, function_base_add, function_base_add_v2, function_base_debug
 from blog.models import Article
 from blog.customserializers import ArticleSerializer, UserArticleSerializer, UserSerializer
 from rest_framework.authentication import BasicAuthentication
@@ -165,6 +165,11 @@ class AddView(APIView):
             "function_instance_v2_id": function_instance_v2.task_id,
             "class_instance_quorum_id": class_instance_quorum.task_id,
         }
+        function_instance_debug = function_base_debug.apply_async(
+            args=(x, y),
+            exchange="topic_exchange",
+            routing_key="user.function_instance_debug"
+        )
         return Response(data=msg)
 
 

@@ -198,3 +198,11 @@ def function_base_debug(self, x, y):
     result = x + y
     print('function_base_debug执行结束')
     return result
+
+if __name__ == '__main__':
+
+    function_instance_debug = function_base_debug.apply_async(
+                args=(1, 2),
+                exchange="topic_exchange",
+                routing_key="user.function_instance_debug"
+            )
