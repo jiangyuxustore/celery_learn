@@ -129,7 +129,7 @@ class ClassBaseAdd(Task):
                 self.request.hostname
             ))
             log_django.info("rabbitmq相关的信息:{}".format(self.request.delivery_info))
-            time.sleep(8)
+            # time.sleep(8)
             self.update_state(state="PROGRESS", meta={'progress': "90%"})
             time.sleep(1)
             result = x + y
@@ -168,7 +168,7 @@ def function_base_add(self, x, y):
     :return:
     """
     print('function_base_add开始执行')
-    time.sleep(10)
+    # time.sleep(10)
     result = x + y
     print('function_base_add执行结束')
     return result
@@ -179,7 +179,7 @@ def function_base_add(self, x, y):
 @shared_task(name='blog.function_base_add_v2', bind=True, autoretry_for=(Exception, ), retry_kwargs={"max_retry": 2, "countdown": 8})
 def function_base_add_v2(self, x, y):
     print('function_base_add_v2开始执行')
-    time.sleep(8)
+    # time.sleep(8)
     result = x + y
     print('function_base_add_v2执行结束')
     return result
@@ -198,11 +198,3 @@ def function_base_debug(self, x, y):
     result = x + y
     print('function_base_debug执行结束')
     return result
-
-if __name__ == '__main__':
-
-    function_instance_debug = function_base_debug.apply_async(
-                args=(1, 2),
-                exchange="topic_exchange",
-                routing_key="user.function_instance_debug"
-            )
