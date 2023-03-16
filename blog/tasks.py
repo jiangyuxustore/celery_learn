@@ -2,6 +2,7 @@ import time
 import django
 import os
 from celery import shared_task, Task
+from celery.contrib import rdb
 from celery.exceptions import SoftTimeLimitExceeded, Reject
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dxflearn.settings")
 django.setup()
@@ -106,7 +107,7 @@ class ClassBaseAdd(Task):
     第三种失败重试是基于类的, 只需要指定类属性就可以进行失败重试了
     这里指定了autoretry_for, max_retries, default_retry_delay
     """
-    acks_late = True
+    acks_late = True  # 要想使用Reject需要设置acks_late=True
     name = "blog.ClassBaseAdd"
     autoretry_for = (Exception, )
     max_retries = 2
@@ -181,4 +182,19 @@ def function_base_add_v2(self, x, y):
     time.sleep(8)
     result = x + y
     print('function_base_add_v2执行结束')
+    return result
+
+
+@shared_task(name='blog.function_base_debug', bind=True, autoretry_for=(Exception, ))
+def function_base_debug(self, x, y):
+    """
+    :param self:
+    :param x:
+    :param y:
+    :return:
+    """
+    print('function_base_debug开始执行')
+    rdb.set_trace()
+    result = x + y
+    print('function_base_debug执行结束')
     return result
