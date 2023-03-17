@@ -198,3 +198,34 @@ def function_base_debug(self, x, y):
     result = x + y
     print('function_base_debug执行结束')
     return result
+
+
+@shared_task(name='blog.add', bind=True, autoretry_for=(Exception, ))
+def add(self, x, y, z):
+    """
+    :param self:
+    :param x:
+    :param y:
+    :param z:
+    :return:
+    """
+    print('add开始执行')
+    result = x + y + z
+    print('add执行结束')
+    return result
+
+
+@shared_task(name='blog.multi', bind=True, autoretry_for=(Exception, ))
+def multi(self, x, y, z):
+    """
+    :param self:
+    :param x:
+    :param y:
+    :param z:
+    :return:
+    """
+    print('multi开始执行')
+    result = x * y * z
+    print('multi执行结束')
+    return result
+
