@@ -209,7 +209,7 @@ def add(self, x, y, z):
     :param z:
     :return:
     """
-    print('add开始执行')
+    print('add开始执行, x:{}, y:{}, z:{}'.format(x, y, z))
     result = x + y + z
     print('add执行结束')
     return result
@@ -224,7 +224,7 @@ def multi(self, x, y, z):
     :param z:
     :return:
     """
-    print('multi开始执行')
+    print('multi开始执行, x:{}, y:{}, z:{}'.format(x, y, z))
     result = x * y * z
     print('multi执行结束')
     return result
