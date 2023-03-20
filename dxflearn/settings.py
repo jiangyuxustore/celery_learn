@@ -145,7 +145,7 @@ CACHES = {
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",  # 使用redis集群时需要设置REDIS_CLIENT_CLASS="rediscluster.RedisCluster"
-            'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',  # 使用redis集群时需要设置CONNECTION_POOL_CLASS="rediscluster.connection.ClusterConnectionPool"
+            # 'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',  # 使用redis集群时需要设置CONNECTION_POOL_CLASS="rediscluster.connection.ClusterConnectionPool"
             "CONNECTION_POOL_KWARGS": {
                 "max_connections": 100,
                 "retry_on_timeout": True,
@@ -163,7 +163,7 @@ CACHES = {
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",
-            'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',
+            # 'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',
             "CONNECTION_POOL_KWARGS": {
                 "max_connections": 100,
                 "retry_on_timeout": True,
