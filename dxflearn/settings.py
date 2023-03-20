@@ -140,7 +140,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://124.70.136.165:6379/4",  # 指明使用redis的1号数据库
+        "LOCATION": "redis://192.168.146.201:8003/0",  # 使用redis 读集群
         "TIMEOUT": 86400,
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
@@ -153,7 +153,7 @@ CACHES = {
     },
     "session": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://124.70.136.165:6379/4",  # 指明使用redis的3号数据库
+        "LOCATION": "redis://192.168.146.201:8003/0",  # 使用redis 读集群
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -186,9 +186,10 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 
 # ====================================celery 相关配置 ==========================================
 
-# CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'
-CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'
-CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3'
+# CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'   # 使用单机的rabbitmq
+# CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3' # 使用单机的redis
+CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'    # 使用单机的rabbitmq集群
+CELERY_RESULT_BACKEND = 'redis://192.168.146.201:8002/0'                # 使用单机的redis 写集群
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
 # RESULT_BACKEND_TRANSPORT_OPTIONS 是redis断开重连的时间
