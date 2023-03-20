@@ -144,7 +144,9 @@ CACHES = {
         "TIMEOUT": 86400,
         "OPTIONS": {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-            "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",  # 使用redis集群时需要设置REDIS_CLIENT_CLASS="rediscluster.RedisCluster"
+            "CLIENT_CLASS": "common.CustomRedisCluster",
+            # 使用redis集群时需要设置REDIS_CLIENT_CLASS="rediscluster.RedisCluster"
+            # "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",  # 使用redis集群时需要设置REDIS_CLIENT_CLASS="rediscluster.RedisCluster"
             # 'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',  # 使用redis集群时需要设置CONNECTION_POOL_CLASS="rediscluster.connection.ClusterConnectionPool"
             "CONNECTION_POOL_KWARGS": {
                 "max_connections": 100,
@@ -156,24 +158,24 @@ CACHES = {
             "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
         }
     },
-    "session": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.146.201:8003/0",  # 使用redis 读集群
-        "TIMEOUT": 86400,
-        "OPTIONS": {
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-            "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",
-            # 'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',
-            "CONNECTION_POOL_KWARGS": {
-                "max_connections": 100,
-                "retry_on_timeout": True,
-                "skip_full_coverage_check": True
-            },
-            # "PASSWORD": "django-insecure-jiangyuxu-learn-django",
-            "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
-            "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
-        }
-    }
+    # "session": {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": "redis://192.168.146.201:8003/0",  # 使用redis 读集群
+    #     "TIMEOUT": 86400,
+    #     "OPTIONS": {
+    #         "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+    #         "REDIS_CLIENT_CLASS": "rediscluster.RedisCluster",
+    #         # 'CONNECTION_POOL_CLASS': 'rediscluster.connection.ClusterConnectionPool',
+    #         "CONNECTION_POOL_KWARGS": {
+    #             "max_connections": 100,
+    #             "retry_on_timeout": True,
+    #             "skip_full_coverage_check": True
+    #         },
+    #         # "PASSWORD": "django-insecure-jiangyuxu-learn-django",
+    #         "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
+    #         "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
+    #     }
+    # }
 }
 
 # session使用的存储方式
