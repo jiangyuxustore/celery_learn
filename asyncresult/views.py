@@ -2,7 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from celery import result
 from rest_framework import status
-from django.core.cache import cache
+from utils.rediscache import c_cache
 
 
 class AsyncResult(APIView):
@@ -37,8 +37,7 @@ class AsyncResultV2(APIView):
         version = kwargs.get("version")
         task_id = kwargs.get("task_id")
         task_id = "celery-task-meta-{}".format(task_id)
-        print("version:{}, task_id:{}".format(version, task_id))
-        response = cache.get(task_id)
+        response = c_cache.conn.get(task_id)
         print(response)
         if response:
             data = {
