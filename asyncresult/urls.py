@@ -20,5 +20,6 @@ app_name = "async"  # 指定app_name用户反向生成url
 
 # URL 最好是以^开头, 以$结尾, 新版django如果URL中包含正则那么需要引入re_path
 urlpatterns = [
-    re_path(r'^(?P<version>[v1|v2]+)/(?P<task_id>[a-zA-Z0-9-]+)/$', views.AsyncResult.as_view(), name="result"),
+    re_path(r'^v1/(?P<task_id>[a-zA-Z0-9-]+)/$', views.AsyncResult.as_view(), name="result"),
+    re_path(r'^v2/(?P<task_id>[a-zA-Z0-9-]+)/$', views.AsyncResultV2.as_view(), name="sync-result"),
 ]
