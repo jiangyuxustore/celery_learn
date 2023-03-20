@@ -146,7 +146,7 @@ CACHES = {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 100, "retry_on_timeout": True},
-            "PASSWORD": "django-insecure-jiangyuxu-learn-django",
+            # "PASSWORD": "django-insecure-jiangyuxu-learn-django",
             "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
             "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
         }
@@ -158,7 +158,7 @@ CACHES = {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "CONNECTION_POOL_KWARGS": {"max_connections": 100, "retry_on_timeout": True},
-            "PASSWORD": "django-insecure-jiangyuxu-learn-django",
+            # "PASSWORD": "django-insecure-jiangyuxu-learn-django",
             "SOCKET_CONNECT_TIMEOUT": 5,  # 建立socket连接的超时时间
             "SOCKET_TIMEOUT": 5,          # 建立socket连接后的读写的超时时间
         }
@@ -188,8 +188,8 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 
 # CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'   # 使用单机的rabbitmq
 # CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3' # 使用单机的redis
-CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'    # 使用单机的rabbitmq集群
-CELERY_RESULT_BACKEND = 'redis://192.168.146.201:8002/0'                # 使用单机的redis 写集群
+CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'    # 使用rabbitmq集群
+CELERY_RESULT_BACKEND = 'redis://192.168.146.201:8002/0'                # 使用redis 写集群
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
 # RESULT_BACKEND_TRANSPORT_OPTIONS 是redis断开重连的时间
