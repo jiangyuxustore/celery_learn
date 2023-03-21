@@ -242,8 +242,8 @@ CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'    # 使用
 CELERY_RESULT_BACKEND = "celery_redis_cluster_backend.redis_cluster.RedisClusterBackend"
 CELERY_REDIS_CLUSTER_SETTINGS = {'startup_nodes': [
     {"host": "192.168.146.138", "port": "6379"},
-    {"host": "192.168.146.140", "port": "6380"},
-    {"host": "192.168.146.142", "port": "6381"}
+    {"host": "192.168.146.140", "port": "6379"},
+    {"host": "192.168.146.142", "port": "6379"}
 ]}
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
