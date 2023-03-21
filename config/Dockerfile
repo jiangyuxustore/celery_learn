@@ -5,6 +5,6 @@ RUN git clone https://github.com/jiangyuxustore/dxflearn.git
 ENV basepath /home/dxflearn
 WORKDIR $basepath
 RUN pip install -r requirements.txt
-ENTRYPOINT ["/home/dxflearn/start.sh"]
+ENTRYPOINT ["/home/dxflearn/startflask.sh"]
 CMD ["/bin/bash"]
 
