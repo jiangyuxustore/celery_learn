@@ -1,0 +1,10 @@
+FROM python:3
+RUN cd /home
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git
+RUN git clone https://github.com/jiangyuxustore/dxflearn.git
+ENV basepath /home/dxflearn
+WORKDIR $basepath
+RUN pip install -r requirements.txt
+ENTRYPOINT ["/home/dxflearn/start.sh"]
+CMD ["/bin/bash"]
+

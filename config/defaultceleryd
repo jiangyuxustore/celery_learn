@@ -1,0 +1,30 @@
+#这个是celery模块生成的可执行文件，在你的环境的/urs/local/bin/目录下
+ELERY_BIN="/usr/local/bin/celery"
+
+
+# 应用的名称,这里最好指定具体的路径，比如proj是一个目录，里面有一个app.py app.py里面有
+#celery实例 则你可以指定CELERY_APP="proj.app"
+CELERY_APP="dxflearn.celery"
+
+# 项目所在的目录
+CELERYD_CHDIR="/home/dxflearn"
+
+# Extra command-line arguments to the worker
+CELERYD_OPTS="--time-limit=300 --concurrency=1 --statedb=/var/run/celery/%n.state -Q web_task"
+
+# %n will be replaced with the first part of the nodename.
+CELERYD_LOG_FILE="/var/log/celery/%n%I.log"
+CELERYD_PID_FILE="/var/run/celery/%n.pid"
+
+# Workers should run as an unprivileged user.
+#   You need to create this user manually (or you can choose
+#   a user/group combination that already exists (e.g., nobody).
+# 这里不要使用root用户，我是为了省事没创建用户了
+CELERYD_USER="root"
+CELERYD_GROUP="root"
+
+# If enabled pid and log directories will be created if missing,
+# and owned by the userid/group configured.
+CELERY_CREATE_DIRS=1
+#这里面可以设置环境变量
+export SECRET_KEY="jiangyuxu"
