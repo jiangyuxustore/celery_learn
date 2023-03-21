@@ -27,6 +27,8 @@ urlpatterns = [
             views.UserArticleDetail.as_view(), name="user-article-detail"),
     re_path(r'^(?P<version>[v1|v2]+)/async-articles/$', views.AsyncArticleList.as_view(), name="async-article-list"),
     re_path(r'^(?P<version>[v1|v2]+)/async-add/$', views.AddView.as_view(), name="add"),
-    re_path(r'^(?P<version>[v1|v2]+)/remove-task/$', views.RemoveTask.as_view(), name="add"),
-    re_path(r'^(?P<version>[v1|v2]+)/terminate-task/$', views.TerminateTask.as_view(), name="add"),
+    re_path(r'^(?P<version>[v1|v2]+)/remove-task/$', views.RemoveTask.as_view(), name="remove-add"),
+    re_path(r'^(?P<version>[v1|v2]+)/terminate-task/$', views.TerminateTask.as_view(), name="terminate-add"),
+    re_path(r'^(?P<version>[v1|v2]+)/debug-task/$', views.DebugView.as_view(), name="debug-add"),
+
 ]

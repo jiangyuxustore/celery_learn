@@ -165,11 +165,22 @@ class AddView(APIView):
             "function_instance_v2_id": function_instance_v2.task_id,
             "class_instance_quorum_id": class_instance_quorum.task_id,
         }
+        return Response(data=msg)
+
+
+class DebugView(APIView):
+    def post(self, request, *args, **kwargs):
+        x = request.data.get('x', 0)
+        y = request.data.get('y', 0)
         function_instance_debug = function_base_debug.apply_async(
             args=(x, y),
             exchange="topic_exchange",
             routing_key="user.function_instance_debug"
         )
+        msg = {
+            "msg": "debug任务发送成功",
+            "function_instance_debug_id": function_instance_debug.task_id,
+        }
         return Response(data=msg)
 
 
