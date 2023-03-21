@@ -236,9 +236,15 @@ EMAIL_HOST_PASSWORD = 'msxvsbobaltbbgcf'
 # ====================================celery 相关配置 ==========================================
 
 # CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@124.70.136.165:5672'   # 使用单机的rabbitmq
-CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3' # 使用单机的redis
+# CELERY_RESULT_BACKEND = 'redis://:django-insecure-jiangyuxu-learn-django@124.70.136.165:6379/3' # 使用单机的redis
 CELERY_BROKER_URL = 'pyamqp://liying:jiangyuxu@192.168.146.201:8001'    # 使用rabbitmq集群
 # CELERY_RESULT_BACKEND = 'redis://192.168.146.201:8002/0'                # 使用redis 写集群
+CELERY_RESULT_BACKEND = "celery_redis_cluster_backend.redis_cluster.RedisClusterBackend"
+CELERY_REDIS_CLUSTER_SETTINGS = {'startup_nodes': [
+    {"host": "192.168.146.138", "port": "6379"},
+    {"host": "192.168.146.140", "port": "6380"},
+    {"host": "192.168.146.142", "port": "6381"}
+]}
 CELERY_RESULT_EXPIRES = 3600 * 12  # celery任务结果过期时间
 CELERY_TIMEZONE = 'Asia/Shanghai'
 # RESULT_BACKEND_TRANSPORT_OPTIONS 是redis断开重连的时间
