@@ -1,5 +1,5 @@
 FROM python:3
-RUN cd /home
+WORKDIR /home
 RUN touch a.txt
 RUN ls
 RUN apt-get update && apt-get upgrade -y && apt-get install -y git
