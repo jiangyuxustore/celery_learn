@@ -7,6 +7,7 @@ RUN git config --global url.https://github.com/.insteadOf git://github.com/
 RUN pip install -i https://pypi.douban.com/simple flask flask_restful
 RUN chmod 777 startflask.sh
 RUN ls
+RUN pwd
 EXPOSE 5000
 ENTRYPOINT ["sh /home/dxflearn/startflask.sh"]
 CMD ["/bin/bash"]
