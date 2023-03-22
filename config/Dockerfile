@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 WORKDIR /home
 RUN touch a.txt
 RUN ls
-RUN apt-get update && apt-get install -y whatever && apt-get upgrade -y && apt-get install -y git && apt-get install python3-pip
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git && apt-get install python3-pip
 RUN git clone https://github.com/jiangyuxustore/dxflearn.git
 ENV basepath /home/dxflearn
 WORKDIR $basepath
