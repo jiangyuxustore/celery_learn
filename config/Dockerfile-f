@@ -9,5 +9,6 @@ RUN chmod +x startflask.sh
 RUN pwd
 RUN ls
 EXPOSE 5000
-ENTRYPOINT ["bash", "/home/dxflearn/startflask.sh"]
-#CMD ["/bin/bash"]
+# ENTRYPOINT ["bash", "/home/dxflearn/startflask.sh"]
+ENTRYPOINT ["/home/dxflearn/startflask.sh"]
+CMD ["/bin/bash"]
