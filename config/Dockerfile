@@ -8,6 +8,7 @@ ENV basepath /home/dxflearn
 WORKDIR $basepath
 RUN pwd
 RUN git config --global url.https://github.com/.insteadOf git://github.com/
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 ENTRYPOINT ["/home/dxflearn/startflask.sh"]
 CMD ["/bin/bash"]
