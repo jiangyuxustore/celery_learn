@@ -10,4 +10,4 @@ RUN pwd
 RUN ls
 EXPOSE 5000
 ENTRYPOINT ["/home/dxflearn/startflask.sh"]
-CMD ["/bin/sh"]
+CMD ["/bin/bash"]
